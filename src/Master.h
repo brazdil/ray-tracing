@@ -29,7 +29,7 @@ private:
 		int col_to;
 	};
 
-	static const unsigned char mVersion = 1;
+	static const unsigned char mVersion;
 
 	Logger& mLogger;
 	unsigned short mPort;

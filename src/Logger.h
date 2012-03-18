@@ -53,6 +53,7 @@ private:
 	int mMaxLevel;
 	string mTitle;
 	bool mProgressBar_Enabled;
+	bool mProgressBar_Finished;
 	long mProgressBar_Value;
 	long mProgressBar_LastValue;
 	long mProgressBar_Max;

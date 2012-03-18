@@ -14,6 +14,7 @@ Logger::Logger()
 	  mMaxLevel(2),
 	  mTitle(),
       mProgressBar_Enabled(false),
+      mProgressBar_Finished(true),
       mProgressBar_Value(0),
       mProgressBar_Max(100) {
 }
@@ -80,7 +81,7 @@ void Logger::println(string message, MessageImportance level) {
 		if (level == ERROR)
 			std::cerr << "ERROR - ";
 		std::cerr << message << std::endl << std::flush;
-		printProgressBar();
+		printProgressBar(true);
 	}
 }
 
@@ -117,6 +118,7 @@ void Logger::printProgressBar(bool force) {
 			std::cerr << "] ";
 			std::cerr << percent << "." << tenth << "%";
 			std::cerr << std::flush;
+			mProgressBar_Finished = false;
 		}
 	}
 }
@@ -136,8 +138,8 @@ void Logger::incrementAndPrintProgressBar(long delta, bool force) {
 
 void Logger::finish() {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
-	if (mProgressBar_Enabled) {
-		mProgressBar_Enabled = false;
+	if (mProgressBar_Enabled && !mProgressBar_Finished) {
+		mProgressBar_Finished = true;
 		std::cerr << std::endl;
 	}
 }
