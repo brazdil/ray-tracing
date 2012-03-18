@@ -5,14 +5,14 @@
  *      Author: db538
  */
 
-#ifndef CCAMERA_H_
-#define CCAMERA_H_
+#ifndef CAMERA_H_
+#define CAMERA_H_
 
 #include <stdexcept>
 #include <Eigen/Dense>
 using namespace Eigen;
 
-class CCamera {
+class Camera {
 private:
 
 	Vector3d mPosition;
@@ -25,9 +25,9 @@ private:
 
 public:
 
-	CCamera();
-	CCamera(const Vector3d& position, const Vector3d& look_at, double viewing_angle);
-	virtual ~CCamera();
+	Camera();
+	Camera(const Vector3d& position, const Vector3d& look_at, double viewing_angle);
+	virtual ~Camera();
 
     Vector3d getDirection() const;
     Vector3d getLookAt() const;
@@ -37,4 +37,4 @@ public:
     double getViewingAngle() const;
 };
 
-#endif /* CCAMERA_H_ */
+#endif /* CAMERA_H_ */

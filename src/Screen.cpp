@@ -1,15 +1,15 @@
 /*
- * CScreenRect.cpp
+ * ScreenRect.cpp
  *
  *  Created on: Mar 16, 2012
  *      Author: db538
  */
 
-#include "CScreen.h"
+#include "Screen.h"
 #include <iostream>
 
-CScreen::CScreen(const CCamera& camera, double distance, double aspect_ratio)
-	: mAspectRatio(aspect_ratio), mDistance(distance), mCamera(camera) {
+Screen::Screen(const Camera& camera, double distance, double aspect_ratio)
+	: mCamera(camera), mDistance(distance), mAspectRatio(aspect_ratio) {
 	if (distance <= 0.0)
 		throw std::invalid_argument("Distance has to be positive");
 	if (aspect_ratio <= 0.0)
@@ -27,30 +27,30 @@ CScreen::CScreen(const CCamera& camera, double distance, double aspect_ratio)
 	mVertical = -2.0 * upwards;
 }
 
-Vector3d CScreen::getTopLeftCorner() const {
+Vector3d Screen::getTopLeftCorner() const {
     return mTopLeftCorner;
 }
 
-Vector3d CScreen::getHorizontal() const {
+Vector3d Screen::getHorizontal() const {
     return mHorizontal;
 }
 
-double CScreen::getAspectRatio() const {
+double Screen::getAspectRatio() const {
     return mAspectRatio;
 }
 
-double CScreen::getDistance() const {
+double Screen::getDistance() const {
     return mDistance;
 }
 
-Vector3d CScreen::getVertical() const {
+Vector3d Screen::getVertical() const {
     return mVertical;
 }
 
-CCamera CScreen::getCamera() const {
+Camera Screen::getCamera() const {
 	return mCamera;
 }
 
-CScreen::~CScreen() {
+Screen::~Screen() {
 }
 

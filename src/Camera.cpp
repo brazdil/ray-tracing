@@ -1,20 +1,20 @@
 /*
- * CCamera.cpp
+ * Camera.cpp
  *
  *  Created on: Mar 16, 2012
  *      Author: db538
  */
 
-#include "CCamera.h"
+#include "Camera.h"
 
 #include <iostream>
 #include "extra_math.h"
 
-CCamera::CCamera() {
+Camera::Camera() {
 
 }
 
-CCamera::CCamera(const Vector3d& position, const Vector3d& look_at, double viewing_angle)
+Camera::Camera(const Vector3d& position, const Vector3d& look_at, double viewing_angle)
 	: mPosition(position), mLookAt(look_at), mViewingAngle(viewing_angle) {
 
 	if ((viewing_angle <= 0.0) || (viewing_angle >= M_PI))
@@ -69,31 +69,31 @@ CCamera::CCamera(const Vector3d& position, const Vector3d& look_at, double viewi
 	mSideways.normalize();
 }
 
-Vector3d CCamera::getDirection() const {
+Vector3d Camera::getDirection() const {
     return mDirection;
 }
 
-Vector3d CCamera::getLookAt() const {
+Vector3d Camera::getLookAt() const {
     return mLookAt;
 }
 
-Vector3d CCamera::getPosition() const {
+Vector3d Camera::getPosition() const {
     return mPosition;
 }
 
-Vector3d CCamera::getSideways() const {
+Vector3d Camera::getSideways() const {
     return mSideways;
 }
 
-Vector3d CCamera::getUp() const {
+Vector3d Camera::getUp() const {
     return mUp;
 }
 
-double CCamera::getViewingAngle() const
+double Camera::getViewingAngle() const
 {
     return mViewingAngle;
 }
 
-CCamera::~CCamera() {
+Camera::~Camera() {
 }
 

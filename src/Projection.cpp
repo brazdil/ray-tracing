@@ -5,13 +5,13 @@
  *      Author: db538
  */
 
-#include "CProjection.h"
+#include "Projection.h"
 
-CProjection::CProjection(const CScreen& screen)
+Projection::Projection(const Screen& screen)
 	: mScreen(screen) {
 
 }
 
-CProjection::~CProjection() {
+Projection::~Projection() {
 }
 
