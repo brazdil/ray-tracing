@@ -9,6 +9,8 @@
 #define LOGGER_H_
 
 #include <string>
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include <boost/thread.hpp>
 
 using namespace std;
@@ -23,36 +25,37 @@ public:
 		DETAILED = 3
 	};
 
-	static Logger* getInstance();
-	static void deleteInstance();
+	Logger();
+	virtual ~Logger();
 
+	int  getLevel();
 	void setLevel(int level);
-	void setTitle(string title);
-	void enableProgressBar(bool value);
-	void setProgressBarValue(int value);
-	void setProgressBarMax(int value);
 
+	void setTitle(string title);
+
+	void println(boost::basic_format<char> format, MessageImportance level);
 	void println(string message, MessageImportance level);
-	void printProgressBar();
-	void setAndPrintProgressBar(int value);
-	void incrementAndPrintProgressBar();
+
+	void enableProgressBar(bool value);
+	void setProgressBarValue(long value);
+	void setProgressBarMax(long value);
+	void printProgressBar(bool force = false);
+	void setAndPrintProgressBar(long value, bool force = false);
+	void incrementAndPrintProgressBar(long delta = 1, bool force = false);
 
 	void finish();
 
 private:
 
-	Logger();
-	virtual ~Logger();
 	void clearProgressBar();
 
-	static Logger* _Instance;
-	boost::mutex mObjectLock;
+	boost::recursive_mutex mObjectLock;
 	int mMaxLevel;
 	string mTitle;
 	bool mProgressBar_Enabled;
-	int mProgressBar_Value;
-	int mProgressBar_LastValue;
-	int mProgressBar_Max;
+	long mProgressBar_Value;
+	long mProgressBar_LastValue;
+	long mProgressBar_Max;
 };
 
 #endif /* LOGGER_H_ */

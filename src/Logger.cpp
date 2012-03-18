@@ -9,21 +9,6 @@
 #include <iostream>
 #include <stdexcept>
 
-Logger* Logger::_Instance = NULL;
-
-Logger* Logger::getInstance() {
-	if (_Instance == NULL)
-		_Instance = new Logger();
-	return _Instance;
-}
-
-void Logger::deleteInstance() {
-	if (_Instance != NULL) {
-		_Instance->finish();
-		delete _Instance;
-	}
-}
-
 Logger::Logger()
 	: mObjectLock(),
 	  mMaxLevel(2),
@@ -34,10 +19,16 @@ Logger::Logger()
 }
 
 Logger::~Logger() {
+	finish();
+}
+
+int Logger::getLevel() {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
+	return mMaxLevel;
 }
 
 void Logger::setLevel(int level) {
-	boost::mutex::scoped_lock lock(mObjectLock);
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (level < 0)
 		mMaxLevel = 0;
 	else
@@ -45,17 +36,17 @@ void Logger::setLevel(int level) {
 }
 
 void Logger::setTitle(string title) {
-	boost::mutex::scoped_lock lock(mObjectLock);
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	mTitle = title;
 }
 
 void Logger::enableProgressBar(bool value) {
-	boost::mutex::scoped_lock lock(mObjectLock);
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	mProgressBar_Enabled = value;
 }
 
-void Logger::setProgressBarValue(int value) {
-	boost::mutex::scoped_lock lock(mObjectLock);
+void Logger::setProgressBarValue(long value) {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (value < 0)
 		throw std::invalid_argument("Progress bar value has to be positive");
 	else if (value > mProgressBar_Max)
@@ -64,8 +55,8 @@ void Logger::setProgressBarValue(int value) {
 		mProgressBar_Value = value;
 }
 
-void Logger::setProgressBarMax(int value) {
-	boost::mutex::scoped_lock lock(mObjectLock);
+void Logger::setProgressBarMax(long value) {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (value < 1)
 		throw std::invalid_argument("Progress bar maximum has to be greater than zero");
 
@@ -74,8 +65,12 @@ void Logger::setProgressBarMax(int value) {
 		mProgressBar_Value = mProgressBar_Max;
 }
 
+void Logger::println(boost::basic_format<char> format, MessageImportance level) {
+	println(boost::str(format), level);
+}
+
 void Logger::println(string message, MessageImportance level) {
-	boost::mutex::scoped_lock lock(mObjectLock);
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (level <= mMaxLevel) {
 		clearProgressBar();
 
@@ -89,12 +84,22 @@ void Logger::println(string message, MessageImportance level) {
 	}
 }
 
-void Logger::printProgressBar() {
-	boost::mutex::scoped_lock lock(mObjectLock);
+void Logger::clearProgressBar() {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
+	if (mProgressBar_Enabled) {
+		std::cerr << "\r";
+		for (int i = 0; i < 28; ++i)
+			std::cerr << " ";
+		std::cerr << std::flush;
+	}
+}
+
+void Logger::printProgressBar(bool force) {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (mProgressBar_Enabled) {
 		int last = mProgressBar_LastValue * 1000 / mProgressBar_Max;
 		int now = mProgressBar_Value * 1000 / mProgressBar_Max;
-		if (now != last) {
+		if (force || now != last) {
 			mProgressBar_LastValue = mProgressBar_Value;
 
 			int percent = now / 10;
@@ -116,31 +121,23 @@ void Logger::printProgressBar() {
 	}
 }
 
-void Logger::setAndPrintProgressBar(int value) {
-	boost::mutex::scoped_lock lock(mObjectLock);
+void Logger::setAndPrintProgressBar(long value, bool force) {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (value != mProgressBar_Value) {
 		setProgressBarValue(value);
-		printProgressBar();
+		printProgressBar(force);
 	}
 }
 
-void Logger::incrementAndPrintProgressBar() {
-	boost::mutex::scoped_lock lock(mObjectLock);
-	setAndPrintProgressBar(mProgressBar_Value + 1);
-}
-
-void Logger::clearProgressBar() {
-	boost::mutex::scoped_lock lock(mObjectLock);
-	if (mProgressBar_Enabled) {
-		std::cerr << "\r";
-		for (int i = 0; i < 28; ++i)
-			std::cerr << " ";
-		std::cerr << std::flush;
-	}
+void Logger::incrementAndPrintProgressBar(long delta, bool force) {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
+	setAndPrintProgressBar(mProgressBar_Value + delta, force);
 }
 
 void Logger::finish() {
-	boost::mutex::scoped_lock lock(mObjectLock);
-	if (mProgressBar_Enabled)
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
+	if (mProgressBar_Enabled) {
+		mProgressBar_Enabled = false;
 		std::cerr << std::endl;
+	}
 }
