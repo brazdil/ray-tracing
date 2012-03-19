@@ -9,9 +9,13 @@
 #define MASTER_H_
 
 #include "Logger.h"
-#include <queue>
-
 #include "CommProtocol.h"
+#include "Task.h"
+
+using namespace boost;
+using namespace std;
+
+typedef shared_ptr<thread> thread_ptr;
 
 class Master {
 private:
@@ -26,6 +30,8 @@ private:
 		} state;
 	};
 
+	typedef shared_ptr<PartialTask> PartialTask_ptr;
+
 	static const char mVersion;
 
 	Logger& mLogger;
@@ -35,11 +41,13 @@ private:
 	unsigned int mImageWidth;
 	unsigned int mImageHeight;
 
-	boost::mutex mTasksLock;
-	std::vector<PartialTask*> mTaskList;
+	binary_data mInputFile;
 
-	boost::mutex mWorkersLock;
-	std::vector<boost::thread*> mWorkersList;
+	mutex mTasksLock;
+	vector<PartialTask_ptr> mTaskList;
+
+	mutex mWorkersLock;
+	vector<thread_ptr> mWorkersList;
 
 	void accept_connections();
 	void handle_connection(socket_ptr sock);
