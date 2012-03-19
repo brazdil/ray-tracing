@@ -11,25 +11,22 @@
 #include "Logger.h"
 #include <queue>
 
-#include <boost/array.hpp>
-#include <boost/bind.hpp>
-#include <boost/smart_ptr.hpp>
-#include <boost/asio.hpp>
-#include <boost/thread/thread.hpp>
-
-using boost::asio::ip::tcp;
-
-typedef boost::shared_ptr<tcp::socket> socket_ptr;
+#include "CommProtocol.h"
 
 class Master {
 private:
 
-	struct ImagePart {
-		int col_from;
-		int col_to;
+	struct PartialTask {
+		unsigned int col_from;
+		unsigned int col_to;
+		enum {
+			PENDING,
+			IN_PROGRESS,
+			FINISHED
+		} state;
 	};
 
-	static const unsigned char mVersion;
+	static const char mVersion;
 
 	Logger& mLogger;
 	unsigned short mPort;
@@ -37,8 +34,14 @@ private:
 	unsigned int mWorkDivision;
 	unsigned int mImageWidth;
 	unsigned int mImageHeight;
-	std::queue<ImagePart*> mPartsQueue;
 
+	boost::mutex mTasksLock;
+	std::vector<PartialTask*> mTaskList;
+
+	boost::mutex mWorkersLock;
+	std::vector<boost::thread*> mWorkersList;
+
+	void accept_connections();
 	void handle_connection(socket_ptr sock);
 
 public:

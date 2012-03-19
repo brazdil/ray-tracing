@@ -89,7 +89,7 @@ void Logger::clearProgressBar() {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (mProgressBar_Enabled) {
 		std::cerr << "\r";
-		for (int i = 0; i < 28; ++i)
+		for (int i = 0; i < 35; ++i)
 			std::cerr << " ";
 		std::cerr << std::flush;
 	}
@@ -111,9 +111,9 @@ void Logger::printProgressBar(bool force) {
 			std::cerr << "\r";
 			std::cerr << "[";
 			int i = 0;
-			for (; i < percent / 5; ++i)
+			for (; i < percent / 4; ++i)
 				std::cerr << "#";
-			for (; i < 20; ++i)
+			for (; i < 25; ++i)
 				std::cerr << ".";
 			std::cerr << "] ";
 			std::cerr << percent << "." << tenth << "%";
