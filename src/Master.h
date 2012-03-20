@@ -23,6 +23,7 @@ private:
 	struct PartialTask {
 		unsigned int col_from;
 		unsigned int col_to;
+		unsigned int first_row;
 		enum {
 			PENDING,
 			IN_PROGRESS,

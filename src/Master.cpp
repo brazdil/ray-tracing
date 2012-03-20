@@ -147,21 +147,22 @@ void Master::handle_connection(socket_ptr sock) {
 			}
 
 			if (task) {
-				long pixels_finished = 0;
 				try {
 					mLogger.println(format("%s - Assigning partial task (%d-%d)") % client_address % task->col_from % task->col_to, Logger::DETAILED);
 					buffer_message[0] = CommProtocol::MSG_TASK;
 					asio::write(*sock, asio::buffer(buffer_message, sizeof(char)));
-					array<char, 2 * sizeof(uint32_t)> buffer_task;
+					array<char, 3 * sizeof(uint32_t)> buffer_task;
 					uint32_t col_from = htonl(task->col_from);
 					uint32_t col_to = htonl(task->col_to);
+					uint32_t first_row = htonl(task->first_row);
 					memcpy(buffer_task.c_array(), &col_from, sizeof(uint32_t));
 					memcpy(buffer_task.c_array() + sizeof(uint32_t), &col_to, sizeof(uint32_t));
-					asio::write(*sock, asio::buffer(buffer_task, 2 * sizeof(uint32_t)));
+					memcpy(buffer_task.c_array() + 2 * sizeof(uint32_t), &first_row, sizeof(uint32_t));
+					asio::write(*sock, asio::buffer(buffer_task, 3 * sizeof(uint32_t)));
 
 					mLogger.println(format("%s - Receiving results") % client_address, Logger::DETAILED);
 					for (unsigned int col = task->col_from; col < task->col_to; ++col) {
-						for (unsigned int row = 0; row < mImageHeight; ++row) {
+						for (unsigned int row = (col == task->col_from ? task->first_row : 0); row < mImageHeight; ++row) {
 							array<char, 4> buffer_result;
 							length = sock->read_some(asio::buffer(buffer_result), error);
 							if (error == asio::error::eof || length != sizeof(buffer_result))
@@ -171,14 +172,17 @@ void Master::handle_connection(socket_ptr sock) {
 							if (buffer_result[0] != CommProtocol::MSG_OK)
 								throw std::runtime_error(str(format("%s - Error in computation of %dx%d") % client_address % col % row));
 
-							pixels_finished++;
+							{
+								mutex::scoped_lock lock(mTasksLock);
+								task->first_row++;
+							}
 							mLogger.incrementAndPrintProgressBar();
 						}
 						{
 							mutex::scoped_lock lock(mTasksLock);
 							task->col_from++;
+							task->first_row = 0;
 						}
-						pixels_finished = 0;
 					}
 
 					mLogger.println(format("%s - Partial task finished") % client_address, Logger::DETAILED);
@@ -192,7 +196,6 @@ void Master::handle_connection(socket_ptr sock) {
 						mutex::scoped_lock lock(mTasksLock);
 						task->state = PartialTask::PENDING;
 					}
-					mLogger.incrementAndPrintProgressBar(-pixels_finished, true);
 					throw e;
 				}
 			} else {

@@ -120,7 +120,7 @@ void Slave::run() {
 				mLogger.println(boost::format("Waiting..."), Logger::DETAILED);
 			} else if (buffer_message[0] == CommProtocol::MSG_TASK) {
 				mLogger.println(boost::format("Awaiting task"), Logger::DETAILED);
-				boost::array<char, 2 * sizeof(uint32_t)> buffer_task;
+				boost::array<char, 3 * sizeof(uint32_t)> buffer_task;
 				length = sock.read_some(boost::asio::buffer(buffer_task), error);
 				if (error == boost::asio::error::eof || length != sizeof(buffer_task))
 					throw std::runtime_error(boost::str(boost::format("Unexpected EOF or wrong length")));
@@ -128,16 +128,19 @@ void Slave::run() {
 					throw boost::system::system_error(error);
 				uint32_t col_from;
 				uint32_t col_to;
+				uint32_t first_row;
 				memcpy(&col_from, buffer_task.c_array(), sizeof(uint32_t));
 				memcpy(&col_to, buffer_task.c_array() + sizeof(uint32_t), sizeof(uint32_t));
+				memcpy(&first_row, buffer_task.c_array() + 2 * sizeof(uint32_t), sizeof(uint32_t));
 				col_from = ntohl(col_from);
 				col_to = ntohl(col_to);
+				first_row = ntohl(first_row);
 				mLogger.println(boost::format("Assigned task: %d-%d") % col_from % col_to, Logger::INFORMATIVE);
 				mLogger.enableProgressBar(true);
-				mLogger.setProgressBarMax((col_to - col_from) * image_height);
+				mLogger.setProgressBarMax((col_to - col_from) * image_height - first_row);
 				mLogger.setProgressBarValue(0);
 				for (unsigned int col = col_from; col < col_to; ++col)
-					for (unsigned int row = 0; row < image_height; ++row) {
+					for (unsigned int row = (col == col_from ? first_row : 0); row < image_height; ++row) {
 						mLogger.println(boost::format("Computing %dx%d") % col % row, Logger::DETAILED);
 						boost::this_thread::sleep(boost::posix_time::seconds(1));
 						boost::array<char, 4> buffer_result;
@@ -148,6 +151,7 @@ void Slave::run() {
 						boost::asio::write(sock, boost::asio::buffer(buffer_result, sizeof(buffer_result)));
 						mLogger.incrementAndPrintProgressBar();
 					}
+				mLogger.enableProgressBar(false);
 			} else
 				throw std::runtime_error(boost::str(boost::format("Unknown message from master")));
 		}
