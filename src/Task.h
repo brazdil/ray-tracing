@@ -8,7 +8,6 @@
 #ifndef TASK_H_
 #define TASK_H_
 
-#include "Projection.h"
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
@@ -18,7 +17,7 @@ using namespace boost;
 typedef shared_ptr< vector<char> >	binary_data;
 
 inline binary_data create_binary_data(long len) {
-	return shared_ptr< vector<char> >(new vector<char>(len));
+	return binary_data(new vector<char>(len));
 }
 
 class Task {

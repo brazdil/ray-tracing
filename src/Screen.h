@@ -8,11 +8,28 @@
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
+#include <boost/shared_ptr.hpp>
 #include <stdexcept>
 #include <Eigen/Dense>
+
 using namespace Eigen;
+using namespace boost;
 
 #include "Camera.h"
+
+class Ratio {
+private:
+	unsigned int mNominator;
+	unsigned int mDenominator;
+
+public:
+	Ratio(unsigned int nom, unsigned int den);
+	virtual ~Ratio();
+
+	double getNominator();
+	double getDenominator();
+	double getDouble();
+};
 
 /*
  * CScreen represents the screen rectangle. It contains the position of the top-left corner of the screen
@@ -22,25 +39,27 @@ using namespace Eigen;
 class Screen {
 private:
 
-	Camera mCamera;
+	Camera_ptr mCamera;
 
 	double mDistance;
-	double mAspectRatio;
+	Ratio mAspectRatio;
 	Vector3d mTopLeftCorner;
 	Vector3d mHorizontal;
 	Vector3d mVertical;
 
 public:
 
-	Screen(const Camera& camera, double distance, double aspect_ratio);
+	Screen(Camera_ptr camera, double distance, Ratio aspect_ratio);
 	virtual ~Screen();
 
-	Camera getCamera() const;
+	Camera_ptr getCamera() const;
     Vector3d getTopLeftCorner() const;
     Vector3d getHorizontal() const;
     Vector3d getVertical() const;
-    double getAspectRatio() const;
+    Ratio getAspectRatio() const;
     double getDistance() const;
 };
+
+typedef shared_ptr<Screen> Screen_ptr;
 
 #endif /* SCREEN_H_ */

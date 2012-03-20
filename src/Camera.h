@@ -8,9 +8,12 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
+#include <boost/shared_ptr.hpp>
 #include <stdexcept>
 #include <Eigen/Dense>
+
 using namespace Eigen;
+using namespace boost;
 
 class Camera {
 private:
@@ -36,5 +39,7 @@ public:
     Vector3d getUp() const;
     double getViewingAngle() const;
 };
+
+typedef shared_ptr<Camera> Camera_ptr;
 
 #endif /* CAMERA_H_ */

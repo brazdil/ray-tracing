@@ -16,23 +16,24 @@ TEST(ScreenTest, IllegalArguments) {
 	Vector3d camera_position, camera_lookat;
 	camera_position << 0, 0, 0;
 	camera_lookat << 0, 0, 1;
-	Camera camera(camera_position, camera_lookat, M_PI / 3.0);
+	Camera_ptr camera = Camera_ptr(new Camera(camera_position, camera_lookat, M_PI / 3.0));
 
-	ASSERT_NO_THROW(Screen(camera, 2.0, 4.0 / 3.0));
+	ASSERT_NO_THROW(Screen(camera, 2.0, Ratio(4, 3)));
 
-	ASSERT_THROW(Screen(camera, 0.0, 4.0 / 3.0), std::invalid_argument);
-	ASSERT_THROW(Screen(camera, -1.0, 4.0 / 3.0), std::invalid_argument);
+	ASSERT_THROW(Screen(camera, 0.0, Ratio(4, 3)), std::invalid_argument);
+	ASSERT_THROW(Screen(camera, -1.0, Ratio(4, 3)), std::invalid_argument);
 
-	ASSERT_THROW(Screen(camera, 2.0, 0.0), std::invalid_argument);
-	ASSERT_THROW(Screen(camera, 2.0, -4.0 / 3.0), std::invalid_argument);
+	ASSERT_THROW(Screen(camera, 2.0, Ratio(1, 0)), std::invalid_argument);
+	ASSERT_THROW(Screen(camera, 2.0, Ratio(0, 1)), std::invalid_argument);
+	ASSERT_THROW(Screen(camera, 2.0, Ratio(0, 0)), std::invalid_argument);
 }
 
 TEST(ScreenTest, SimpleScreen) {
 	Vector3d camera_position, camera_lookat;
 	camera_position << 0, 0, 0;
 	camera_lookat << 0, 0, 1;
-	Camera camera(camera_position, camera_lookat, M_PI / 2.0);
-	Screen screen(camera, 2.0, 4.0 / 3.0);
+	Camera_ptr camera = Camera_ptr(new Camera(camera_position, camera_lookat, M_PI / 2.0));
+	Screen screen(camera, 2.0, Ratio(4, 3));
 
 	Vector3d top_left, horizontal, vertical;
 	top_left << -2.0, 1.5, 2.0;

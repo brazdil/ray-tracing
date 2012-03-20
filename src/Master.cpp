@@ -55,7 +55,7 @@ void Master::accept_connections() {
 		acceptor.accept(*sock);
 		{
 			mutex::scoped_lock lock(mWorkersLock);
-			thread_ptr t = shared_ptr<thread>(new thread(bind(&Master::handle_connection, this, sock)));
+			thread_ptr t = thread_ptr(new thread(bind(&Master::handle_connection, this, sock)));
 			mWorkersList.push_back(t);
 		}
 	}
@@ -210,7 +210,7 @@ void Master::run() {
 	mLogger.println("Creating work queue", Logger::DETAILED);
 	unsigned int col_width = mImageWidth / mWorkDivision;
 	for (unsigned int i = 0; i < mWorkDivision; ++i) {
-		PartialTask_ptr part = shared_ptr<PartialTask>(new PartialTask());
+		PartialTask_ptr part = PartialTask_ptr(new PartialTask());
 		part->col_from = i * col_width;
 		if (i < mWorkDivision - 1) part->col_to = (i + 1) * col_width;
 		else                       part->col_to = mImageWidth;
