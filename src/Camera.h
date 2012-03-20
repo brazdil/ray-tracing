@@ -10,26 +10,29 @@
 
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
-#include <Eigen/Dense>
-
-using namespace Eigen;
+#include "utils.h"
+#include "tinyxml2.h"
 using namespace boost;
+using namespace tinyxml2;
 
 class Camera {
 private:
 
 	Vector3d mPosition;
 	Vector3d mLookAt;
-	double mViewingAngle;
+	double mFieldOfView;
 
 	Vector3d mUp;
 	Vector3d mSideways;
 	Vector3d mDirection;
 
+	void init();
+
 public:
 
 	Camera();
-	Camera(const Vector3d& position, const Vector3d& look_at, double viewing_angle);
+	Camera(const Vector3d& position, const Vector3d& look_at, double field_of_view);
+	Camera(XMLElement* xml);
 	virtual ~Camera();
 
     Vector3d getDirection() const;
@@ -37,9 +40,9 @@ public:
     Vector3d getPosition() const;
     Vector3d getSideways() const;
     Vector3d getUp() const;
-    double getViewingAngle() const;
+    double getFieldOfView() const;
 };
 
-typedef shared_ptr<Camera> Camera_ptr;
+typedef shared_ptr<Camera> pCamera;
 
 #endif /* CAMERA_H_ */

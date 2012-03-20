@@ -31,12 +31,16 @@ Master::Master(Logger& logger,
 	mLogger.println(format("\tOutput file:    %s") % mOutputFile, Logger::DETAILED);
 
 	mLogger.println("Loading the scene description", Logger::DETAILED);
-	std::ifstream file(input_file.c_str(), std::ios_base::in|std::ios_base::ate);
-	size_t file_length = file.tellg();
-	file.seekg(0, std::ios_base::beg);
-	file.clear();
-	mInputFile = create_binary_data(file_length);
-	file.read(mInputFile->data(), mInputFile->size());
+	try {
+		std::ifstream file(input_file.c_str(), std::ios_base::in|std::ios_base::ate);
+		size_t file_length = file.tellg();
+		file.seekg(0, std::ios_base::beg);
+		file.clear();
+		mInputFile = create_binary_data(file_length);
+		file.read(mInputFile->data(), mInputFile->size());
+	} catch (std::exception& e) {
+		throw std::runtime_error("Could not load the input file");
+	}
 	Task task(mInputFile);
 
 	// TODO: get height from scene data
@@ -55,7 +59,7 @@ void Master::accept_connections() {
 		acceptor.accept(*sock);
 		{
 			mutex::scoped_lock lock(mWorkersLock);
-			thread_ptr t = thread_ptr(new thread(bind(&Master::handle_connection, this, sock)));
+			pThread t = pThread(new thread(bind(&Master::handle_connection, this, sock)));
 			mWorkersList.push_back(t);
 		}
 	}
@@ -116,10 +120,10 @@ void Master::handle_connection(socket_ptr sock) {
 		bool task_finished = false;
 		while (!task_finished) {
 			// find a task for the slave
-			PartialTask_ptr task;
+			pPartialTask task;
 			{
 				mutex::scoped_lock lock(mTasksLock);
-				for (vector<PartialTask_ptr>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
+				for (vector<pPartialTask>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
 					if ((*it)->state == PartialTask::PENDING) {
 						task = *it;
 						task->state = PartialTask::IN_PROGRESS;
@@ -180,7 +184,7 @@ void Master::handle_connection(socket_ptr sock) {
 				{
 					mutex::scoped_lock lock(mTasksLock);
 					task_finished = true;
-					for (vector<PartialTask_ptr>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
+					for (vector<pPartialTask>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
 						if ((*it)->state != PartialTask::FINISHED) {
 							task_finished = false;
 							break;
@@ -210,7 +214,7 @@ void Master::run() {
 	mLogger.println("Creating work queue", Logger::DETAILED);
 	unsigned int col_width = mImageWidth / mWorkDivision;
 	for (unsigned int i = 0; i < mWorkDivision; ++i) {
-		PartialTask_ptr part = PartialTask_ptr(new PartialTask());
+		pPartialTask part = pPartialTask(new PartialTask());
 		part->col_from = i * col_width;
 		if (i < mWorkDivision - 1) part->col_to = (i + 1) * col_width;
 		else                       part->col_to = mImageWidth;
@@ -235,7 +239,7 @@ void Master::run() {
 		{
 			mutex::scoped_lock lock(mTasksLock);
 			task_finished = true;
-			for (vector<PartialTask_ptr>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
+			for (vector<pPartialTask>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
 				if ((*it)->state != PartialTask::FINISHED) {
 					task_finished = false;
 					break;
@@ -246,7 +250,7 @@ void Master::run() {
 
 	// lock the data structures, so that no worker can change it any more
 	mutex::scoped_lock lock_workers(mWorkersLock);
-	for (vector<thread_ptr>::iterator it = mWorkersList.begin(); it < mWorkersList.end(); it++) {
+	for (vector<pThread>::iterator it = mWorkersList.begin(); it < mWorkersList.end(); it++) {
 		(*it)->join();
 	}
 	mutex::scoped_lock lock_tasks(mTasksLock);

@@ -15,7 +15,7 @@
 using namespace boost;
 using namespace std;
 
-typedef shared_ptr<thread> thread_ptr;
+typedef shared_ptr<thread> pThread;
 
 class Master {
 private:
@@ -30,7 +30,7 @@ private:
 		} state;
 	};
 
-	typedef shared_ptr<PartialTask> PartialTask_ptr;
+	typedef shared_ptr<PartialTask> pPartialTask;
 
 	static const char mVersion;
 
@@ -41,13 +41,13 @@ private:
 	unsigned int mImageWidth;
 	unsigned int mImageHeight;
 
-	binary_data mInputFile;
+	pBinaryData mInputFile;
 
 	mutex mTasksLock;
-	vector<PartialTask_ptr> mTaskList;
+	vector<pPartialTask> mTaskList;
 
 	mutex mWorkersLock;
-	vector<thread_ptr> mWorkersList;
+	vector<pThread> mWorkersList;
 
 	void accept_connections();
 	void handle_connection(socket_ptr sock);

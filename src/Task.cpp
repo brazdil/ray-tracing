@@ -14,10 +14,13 @@
 #include "archive_entry.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
+#include "tinyxml2.h"
 
+using namespace boost;
 using namespace std;
+using namespace tinyxml2;
 
-binary_data extract_file(binary_data input_file, string filename) {
+pBinaryData extract_file(pBinaryData input_file, string filename) {
 	archive *file;
 	archive_entry *file_entry;
 	int res;
@@ -28,7 +31,7 @@ binary_data extract_file(binary_data input_file, string filename) {
 	archive_read_support_format_tar(file);
 	res = archive_read_open_memory(file, input_file->data(), input_file->size());
 	if (res != ARCHIVE_OK)
-		throw std::runtime_error("The input file is not a TAR");
+		throw runtime_error("The input file is not a TAR");
 
 	// find the file
 	bool found_file = false;
@@ -37,26 +40,47 @@ binary_data extract_file(binary_data input_file, string filename) {
 			found_file = true;
 			break;
 		}
-		printf("%s\n", archive_entry_pathname(file_entry));
 	}
 
 	if (!found_file)
-		throw std::runtime_error(boost::str(boost::format("Couldn't find \"%s\" in the input file") % filename));
+		throw std::runtime_error(str(format("Couldn't find \"%s\" in the input file") % filename));
 
 	uint64_t file_length = archive_entry_size(file_entry);
-	binary_data data = create_binary_data(file_length);
+	pBinaryData data = create_binary_data(file_length);
 	archive_read_data(file, (void*) data->data(), data->size());
 
 	// finish
 	res = archive_read_free(file);
 	if (res != ARCHIVE_OK)
-		throw std::runtime_error("The input file is not a TAR");
+		throw runtime_error("The input file is not a TAR");
 
 	return data;
 }
 
-Task::Task(binary_data input_file) {
-	binary_data scene_xml = extract_file(input_file, "scene.xml");
+Task::Task(pBinaryData input_file) {
+	// Load the scene description XML
+	pBinaryData file_xml_scene = extract_file(input_file, "scene.xml");
+	XMLDocument xml_scene;
+	int error = xml_scene.Parse(file_xml_scene->data());
+	if (error != XML_SUCCESS)
+		throw runtime_error(str(format("Could not parse the scene description: %s") % xml_scene.GetErrorStr1()));
+
+	// Check root element's name - raytracing
+	XMLElement* xml_root = xml_scene.RootElement();
+	if (!xml_root || !XMLUtil::StringEqual(xml_root->Name(), "raytracing"))
+		throw runtime_error("The input file does not contain scene description");
+
+	// Parse camera
+	XMLElement* xml_elem_camera = xml_root->FirstChildElement("camera");
+	if (!xml_elem_camera)
+		throw runtime_error("Scene description doesn't contain camera information");
+	mCamera = pCamera(new Camera(xml_elem_camera));
+
+	// Parse screen
+	XMLElement* xml_elem_screen = xml_root->FirstChildElement("screen");
+	if (!xml_elem_screen)
+		throw runtime_error("Scene description doesn't contain screen information");
+	mScreen = pScreen(new Screen(mCamera, xml_elem_screen));
 }
 
 Task::~Task() {

@@ -16,7 +16,7 @@ TEST(ScreenTest, IllegalArguments) {
 	Vector3d camera_position, camera_lookat;
 	camera_position << 0, 0, 0;
 	camera_lookat << 0, 0, 1;
-	Camera_ptr camera = Camera_ptr(new Camera(camera_position, camera_lookat, M_PI / 3.0));
+	pCamera camera = pCamera(new Camera(camera_position, camera_lookat, M_PI / 3.0));
 
 	ASSERT_NO_THROW(Screen(camera, 2.0, Ratio(4, 3)));
 
@@ -32,7 +32,7 @@ TEST(ScreenTest, SimpleScreen) {
 	Vector3d camera_position, camera_lookat;
 	camera_position << 0, 0, 0;
 	camera_lookat << 0, 0, 1;
-	Camera_ptr camera = Camera_ptr(new Camera(camera_position, camera_lookat, M_PI / 2.0));
+	pCamera camera = pCamera(new Camera(camera_position, camera_lookat, M_PI / 2.0));
 	Screen screen(camera, 2.0, Ratio(4, 3));
 
 	Vector3d top_left, horizontal, vertical;

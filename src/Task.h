@@ -8,21 +8,26 @@
 #ifndef TASK_H_
 #define TASK_H_
 
+#include "Camera.h"
+#include "Screen.h"
+
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 using namespace std;
 using namespace boost;
 
-typedef shared_ptr< vector<char> >	binary_data;
+typedef shared_ptr< vector<char> >	pBinaryData;
 
-inline binary_data create_binary_data(long len) {
-	return binary_data(new vector<char>(len));
+inline pBinaryData create_binary_data(long len) {
+	return pBinaryData(new vector<char>(len));
 }
 
 class Task {
+	pCamera mCamera;
+	pScreen mScreen;
 public:
-	Task(binary_data input_file);
+	Task(pBinaryData input_file);
 	virtual ~Task();
 };
 

@@ -16,20 +16,9 @@ using namespace Eigen;
 using namespace boost;
 
 #include "Camera.h"
-
-class Ratio {
-private:
-	unsigned int mNominator;
-	unsigned int mDenominator;
-
-public:
-	Ratio(unsigned int nom, unsigned int den);
-	virtual ~Ratio();
-
-	double getNominator();
-	double getDenominator();
-	double getDouble();
-};
+#include "Ratio.h"
+#include "Color.h"
+#include "tinyxml2.h"
 
 /*
  * CScreen represents the screen rectangle. It contains the position of the top-left corner of the screen
@@ -39,20 +28,25 @@ public:
 class Screen {
 private:
 
-	Camera_ptr mCamera;
+	pCamera mCamera;
 
 	double mDistance;
 	Ratio mAspectRatio;
+	Color mBackgroundColor;
+
 	Vector3d mTopLeftCorner;
 	Vector3d mHorizontal;
 	Vector3d mVertical;
 
+	void init();
+
 public:
 
-	Screen(Camera_ptr camera, double distance, Ratio aspect_ratio);
+	Screen(pCamera camera, double distance, Ratio aspect_ratio, Color background_color);
+	Screen(pCamera camera, tinyxml2::XMLElement* elem);
 	virtual ~Screen();
 
-	Camera_ptr getCamera() const;
+	pCamera getCamera() const;
     Vector3d getTopLeftCorner() const;
     Vector3d getHorizontal() const;
     Vector3d getVertical() const;
@@ -60,6 +54,6 @@ public:
     double getDistance() const;
 };
 
-typedef shared_ptr<Screen> Screen_ptr;
+typedef shared_ptr<Screen> pScreen;
 
 #endif /* SCREEN_H_ */
