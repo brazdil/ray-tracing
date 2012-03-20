@@ -29,6 +29,11 @@ class Task {
 public:
 	Task(pBinaryData input_file);
 	virtual ~Task();
+
+	pCamera getCamera();
+	pScreen getScreen();
 };
+
+typedef shared_ptr<Task> pTask;
 
 #endif /* TASK_H_ */

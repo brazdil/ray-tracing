@@ -43,6 +43,8 @@ void Logger::setTitle(string title) {
 
 void Logger::enableProgressBar(bool value) {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
+	if (mProgressBar_Enabled && !value)
+		clearProgressBar();
 	mProgressBar_Enabled = value;
 }
 

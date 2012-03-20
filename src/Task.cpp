@@ -87,3 +87,10 @@ Task::~Task() {
 	// TODO Auto-generated destructor stub
 }
 
+pCamera Task::getCamera() {
+	return mCamera;
+}
+
+pScreen Task::getScreen() {
+	return mScreen;
+}

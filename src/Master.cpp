@@ -43,8 +43,9 @@ Master::Master(Logger& logger,
 	}
 	Task task(mInputFile);
 
-	// TODO: get height from scene data
-	mImageHeight = image_width * 9 / 16;
+	// Compute height from scene data
+	Ratio aspect_ratio = task.getScreen()->getAspectRatio();
+	mImageHeight = mImageWidth * aspect_ratio.getDenominator() / aspect_ratio.getNumerator();
 }
 
 Master::~Master() {
@@ -96,15 +97,29 @@ void Master::handle_connection(socket_ptr sock) {
 			throw std::runtime_error(str(format("%s - Version mismatch (master: %d, slave: %d)") % client_address % (int) Master::mVersion % (int) version));
 
 		mLogger.println(format("%s - Initialization") % client_address, Logger::DETAILED);
-		uint32_t init_length_n = htonl(1234567);
+		uint32_t input_file_length = mInputFile->size();
+		uint32_t input_file_length_n = htonl(input_file_length);
 		uint32_t image_width_n = htonl(mImageWidth);
 		uint32_t image_height_n = htonl(mImageHeight);
 		array<char, 3 * sizeof(uint32_t)> buffer_init;
-		memcpy(buffer_init.c_array(), &init_length_n, sizeof(uint32_t));
+		memcpy(buffer_init.c_array(), &input_file_length_n, sizeof(uint32_t));
 		memcpy(buffer_init.c_array() + sizeof(uint32_t), &image_width_n, sizeof(uint32_t));
 		memcpy(buffer_init.c_array() + 2 * sizeof(uint32_t), &image_height_n, sizeof(uint32_t));
 		asio::write(*sock, asio::buffer(buffer_init, 3 * sizeof(uint32_t)));
-		// TODO: send the scene
+
+		mLogger.println(format("%s - Uploading input file") % client_address, Logger::DETAILED);
+		uint32_t input_file_sent = 0;
+		boost::array<char, 1024> buffer_data;
+		while (input_file_sent < input_file_length) {
+			if (input_file_length - input_file_sent < 1024) {
+				memcpy(buffer_data.c_array(), mInputFile->data() + input_file_sent, input_file_length - input_file_sent);
+				asio::write(*sock, asio::buffer(buffer_data, input_file_length - input_file_sent));
+			} else {
+				memcpy(buffer_data.c_array(), mInputFile->data() + input_file_sent, 1024);
+				asio::write(*sock, asio::buffer(buffer_data, 1024));
+			}
+			input_file_sent += 1024;
+		}
 
 		mLogger.println(format("%s - Waiting for acknowledgment") % client_address, Logger::DETAILED);
 		array<char, 1> buffer_message;

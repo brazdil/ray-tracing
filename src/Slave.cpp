@@ -6,6 +6,7 @@
  */
 
 #include "Slave.h"
+#include "Task.h"
 
 #include <boost/asio.hpp>
 using boost::asio::ip::tcp;
@@ -50,23 +51,58 @@ void Slave::run() {
 			throw std::runtime_error(boost::str(boost::format("Unexpected EOF or wrong length")));
 		else if (error)
 			throw boost::system::system_error(error);
-		uint32_t scene_desc_length;
+		uint32_t input_file_length;
 		uint32_t image_width;
 		uint32_t image_height;
-		memcpy(&scene_desc_length, buffer_init.c_array(), sizeof(uint32_t));
+		memcpy(&input_file_length, buffer_init.c_array(), sizeof(uint32_t));
 		memcpy(&image_width, buffer_init.c_array() + sizeof(uint32_t), sizeof(uint32_t));
 		memcpy(&image_height, buffer_init.c_array() + 2 * sizeof(uint32_t), sizeof(uint32_t));
-		scene_desc_length = ntohl(scene_desc_length);
+		input_file_length = ntohl(input_file_length);
 		image_width = ntohl(image_width);
 		image_height = ntohl(image_height);
-		mLogger.println(boost::format("Scene description length: %d") % scene_desc_length, Logger::DETAILED);
+		mLogger.println(boost::format("Input file length: %d") % input_file_length, Logger::DETAILED);
 		mLogger.println(boost::format("Image width: %d") % image_width, Logger::DETAILED);
 		mLogger.println(boost::format("Image height: %d") % image_height, Logger::DETAILED);
 
-		mLogger.println(boost::format("Sending acknowledgment"), Logger::DETAILED);
 		boost::array<char, 1> buffer_message;
-		buffer_message[0] = CommProtocol::MSG_ACK;
-		boost::asio::write(sock, boost::asio::buffer(buffer_message, sizeof(buffer_message)));
+		pTask task;
+		{	// special block to destroy the input file after parsing
+			mLogger.println(boost::format("Downloading the input file"), Logger::INFORMATIVE);
+			mLogger.enableProgressBar(true);
+			mLogger.setProgressBarMax(input_file_length);
+			mLogger.setProgressBarValue(0);
+			mLogger.printProgressBar(true);
+			pBinaryData input_file = create_binary_data(input_file_length);
+			boost::array<char, 1024> buffer_input;
+			size_t input_file_fill = 0;
+			while (input_file_fill < input_file_length) {
+				length = sock.read_some(boost::asio::buffer(buffer_input), error);
+				if (error == boost::asio::error::eof || length > input_file_length - input_file_fill || length > buffer_input.size())
+					throw std::runtime_error(boost::str(boost::format("Unexpected EOF or wrong length")));
+				else if (error)
+					throw boost::system::system_error(error);
+				memcpy(input_file->data() + input_file_fill, buffer_input.c_array(), length);
+				input_file_fill += length;
+				mLogger.incrementAndPrintProgressBar(length);
+			}
+			mLogger.enableProgressBar(false);
+
+			mLogger.println(boost::format("Parsing the input file"), Logger::INFORMATIVE);
+			try {
+				task = pTask(new Task(input_file));
+			} catch (std::exception& ex) {
+				mLogger.println(ex.what(), Logger::ERROR);
+				mLogger.println(boost::format("Sending error message"), Logger::DETAILED);
+				boost::array<char, 1> buffer_message;
+				buffer_message[0] = CommProtocol::MSG_ERR;
+				boost::asio::write(sock, boost::asio::buffer(buffer_message, sizeof(buffer_message)));
+				throw std::runtime_error("Could not parse the input file");
+			}
+
+			mLogger.println(boost::format("Sending acknowledgment"), Logger::DETAILED);
+			buffer_message[0] = CommProtocol::MSG_ACK;
+			boost::asio::write(sock, boost::asio::buffer(buffer_message, sizeof(buffer_message)));
+		}
 
 		mLogger.println(boost::format("Entering task loop"), Logger::DETAILED);
 		for (;;) {
@@ -97,7 +133,9 @@ void Slave::run() {
 				col_from = ntohl(col_from);
 				col_to = ntohl(col_to);
 				mLogger.println(boost::format("Assigned task: %d-%d") % col_from % col_to, Logger::INFORMATIVE);
-
+				mLogger.enableProgressBar(true);
+				mLogger.setProgressBarMax((col_to - col_from) * image_height);
+				mLogger.setProgressBarValue(0);
 				for (unsigned int col = col_from; col < col_to; ++col)
 					for (unsigned int row = 0; row < image_height; ++row) {
 						mLogger.println(boost::format("Computing %dx%d") % col % row, Logger::DETAILED);
@@ -108,6 +146,7 @@ void Slave::run() {
 						buffer_result[2] = 111;
 						buffer_result[3] = 222;
 						boost::asio::write(sock, boost::asio::buffer(buffer_result, sizeof(buffer_result)));
+						mLogger.incrementAndPrintProgressBar();
 					}
 			} else
 				throw std::runtime_error(boost::str(boost::format("Unknown message from master")));
