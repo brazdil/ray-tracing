@@ -49,17 +49,17 @@ int main(int argc, const char** argv) {
 	    return EXIT_SUCCESS;
 	}
 
-	Logger log;
-	log.setLevel(arg_log);
-	log.setTitle("master");
-	log.println(boost::format("Logging level set to %d") % log.getLevel(), Logger::DETAILED);
+	pLogger logger = pLogger(new Logger());
+	logger->setLevel(arg_log);
+	logger->setTitle("master");
+	logger->println(boost::format("Logging level set to %d") % logger->getLevel(), Logger::DETAILED);
 
 	if (!var_map.count("input-file") || !var_map.count("output-file")) {
-		log.println("You need to specify the input and output files", Logger::ERROR);
+		logger->println("You need to specify the input and output files", Logger::ERROR);
 		return EXIT_FAILURE;
 	}
 
-	Master master(log, arg_port, arg_width, arg_division, arg_input, arg_output);
+	Master master(logger, arg_port, arg_width, arg_division, arg_input, arg_output);
 	master.run();
 
 	return EXIT_SUCCESS;

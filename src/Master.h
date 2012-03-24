@@ -35,7 +35,7 @@ private:
 
 	static const char mVersion;
 
-	Logger& mLogger;
+	pLogger mLogger;
 	unsigned short mPort;
 	string mOutputFile;
 	unsigned int mWorkDivision;
@@ -54,7 +54,7 @@ private:
 	void handle_connection(socket_ptr sock);
 
 public:
-	Master(Logger& logger,
+	Master(pLogger logger,
 	       unsigned short port,
 	       unsigned int image_width,
 	       unsigned int work_division,

@@ -19,7 +19,7 @@ Color::Color(float r, float g, float b)
 	init();
 }
 
-Color::Color(unsigned int r, unsigned int g, unsigned int b)
+Color::Color(unsigned char r, unsigned char g, unsigned char b)
 	: mR((float)r / 255.0f), mG((float)g / 255.0f), mB((float)b / 255.0f) {
 	init();
 }
@@ -48,3 +48,14 @@ Color::~Color() {
 	// TODO Auto-generated destructor stub
 }
 
+unsigned char Color::getUnsignedCharRed() {
+	return (unsigned char) (mR * 255.0);
+}
+
+unsigned char Color::getUnsignedCharGreen() {
+	return (unsigned char) (mG * 255.0);
+}
+
+unsigned char Color::getUnsignedCharBlue() {
+	return (unsigned char) (mB * 255.0);
+}

@@ -11,7 +11,7 @@
 
 const char Master::mVersion = 1;
 
-Master::Master(Logger& logger,
+Master::Master(pLogger logger,
 		       unsigned short port,
 		       unsigned int image_width,
 		       unsigned int work_division,
@@ -23,14 +23,17 @@ Master::Master(Logger& logger,
 	  mWorkDivision(work_division),
 	  mImageWidth(image_width) {
 
-	mLogger.println("MASTER", Logger::DETAILED);
-	mLogger.println(format("\tPort:           %d") % mPort, Logger::DETAILED);
-	mLogger.println(format("\tImage width:    %d") % mImageWidth, Logger::DETAILED);
-	mLogger.println(format("\tWork division:  %d") % work_division, Logger::DETAILED);
-	mLogger.println(format("\tInput file:     %s") % input_file, Logger::DETAILED);
-	mLogger.println(format("\tOutput file:    %s") % mOutputFile, Logger::DETAILED);
+	if (mWorkDivision > mImageWidth)
+		mWorkDivision = mImageWidth;
 
-	mLogger.println("Loading the scene description", Logger::DETAILED);
+	mLogger->println("MASTER", Logger::DETAILED);
+	mLogger->println(format("\tPort:           %d") % mPort, Logger::DETAILED);
+	mLogger->println(format("\tImage width:    %d") % mImageWidth, Logger::DETAILED);
+	mLogger->println(format("\tWork division:  %d") % mWorkDivision, Logger::DETAILED);
+	mLogger->println(format("\tInput file:     %s") % input_file, Logger::DETAILED);
+	mLogger->println(format("\tOutput file:    %s") % mOutputFile, Logger::DETAILED);
+
+	mLogger->println("Loading the scene description", Logger::DETAILED);
 	try {
 		std::ifstream file(input_file.c_str(), std::ios_base::in|std::ios_base::ate);
 		size_t file_length = file.tellg();
@@ -74,9 +77,9 @@ void Master::handle_connection(socket_ptr sock) {
 		tcp::endpoint client = sock->remote_endpoint(error);
 		if (error) throw system::system_error(error);
 		string client_address = client.address().to_string();
-		mLogger.println(format("New connection from %s") % client_address, Logger::INFORMATIVE);
+		mLogger->println(format("New connection from %s") % client_address, Logger::INFORMATIVE);
 
-		mLogger.println(format("%s - Waiting for handshake") % client_address, Logger::DETAILED);
+		mLogger->println(format("%s - Waiting for handshake") % client_address, Logger::DETAILED);
 		array<char, sizeof(CommProtocol::HANDSHAKE)> buffer_handshake;
 		size_t length = sock->read_some(asio::buffer(buffer_handshake), error);
 		if (error == asio::error::eof || length != sizeof(CommProtocol::HANDSHAKE))
@@ -84,19 +87,19 @@ void Master::handle_connection(socket_ptr sock) {
 		else if (error)
 			throw system::system_error(error);
 
-		mLogger.println(format("%s - Checking handshake") % client_address, Logger::DETAILED);
+		mLogger->println(format("%s - Checking handshake") % client_address, Logger::DETAILED);
 		size_t i = 0;
 		const char* buffer_a = buffer_handshake.c_array();
 		for (; i < sizeof(CommProtocol::HANDSHAKE) - 1; i++)
 			if (buffer_a[i] != CommProtocol::HANDSHAKE[i])
 				throw std::runtime_error(str(format("%s - Handshake error") % client_address));
 
-		mLogger.println(format("%s - Checking version") % client_address, Logger::DETAILED);
+		mLogger->println(format("%s - Checking version") % client_address, Logger::DETAILED);
 		unsigned char version = (unsigned char) buffer_handshake[sizeof(CommProtocol::HANDSHAKE) - 1];
 		if (version != Master::mVersion)
 			throw std::runtime_error(str(format("%s - Version mismatch (master: %d, slave: %d)") % client_address % (int) Master::mVersion % (int) version));
 
-		mLogger.println(format("%s - Initialization") % client_address, Logger::DETAILED);
+		mLogger->println(format("%s - Initialization") % client_address, Logger::DETAILED);
 		uint32_t input_file_length = mInputFile->size();
 		uint32_t input_file_length_n = htonl(input_file_length);
 		uint32_t image_width_n = htonl(mImageWidth);
@@ -107,7 +110,7 @@ void Master::handle_connection(socket_ptr sock) {
 		memcpy(buffer_init.c_array() + 2 * sizeof(uint32_t), &image_height_n, sizeof(uint32_t));
 		asio::write(*sock, asio::buffer(buffer_init, 3 * sizeof(uint32_t)));
 
-		mLogger.println(format("%s - Uploading input file") % client_address, Logger::DETAILED);
+		mLogger->println(format("%s - Uploading input file") % client_address, Logger::DETAILED);
 		uint32_t input_file_sent = 0;
 		boost::array<char, 1024> buffer_data;
 		while (input_file_sent < input_file_length) {
@@ -121,7 +124,7 @@ void Master::handle_connection(socket_ptr sock) {
 			input_file_sent += 1024;
 		}
 
-		mLogger.println(format("%s - Waiting for acknowledgment") % client_address, Logger::DETAILED);
+		mLogger->println(format("%s - Waiting for acknowledgment") % client_address, Logger::DETAILED);
 		array<char, 1> buffer_message;
 		length = sock->read_some(asio::buffer(buffer_message), error);
 		if (error == asio::error::eof || length != sizeof(char))
@@ -131,7 +134,7 @@ void Master::handle_connection(socket_ptr sock) {
 		if (buffer_message[0] != CommProtocol::MSG_ACK)
 			throw std::runtime_error(str(format("%s - Slave failed to initialize") % client_address));
 
-		mLogger.println(format("%s - Task assignment loop") % client_address, Logger::DETAILED);
+		mLogger->println(format("%s - Task assignment loop") % client_address, Logger::DETAILED);
 		bool task_finished = false;
 		while (!task_finished) {
 			// find a task for the slave
@@ -148,7 +151,7 @@ void Master::handle_connection(socket_ptr sock) {
 
 			if (task) {
 				try {
-					mLogger.println(format("%s - Assigning partial task (%d-%d)") % client_address % task->col_from % task->col_to, Logger::DETAILED);
+					mLogger->println(format("%s - Assigning partial task (%d-%d)") % client_address % task->col_from % task->col_to, Logger::DETAILED);
 					buffer_message[0] = CommProtocol::MSG_TASK;
 					asio::write(*sock, asio::buffer(buffer_message, sizeof(char)));
 					array<char, 3 * sizeof(uint32_t)> buffer_task;
@@ -160,7 +163,7 @@ void Master::handle_connection(socket_ptr sock) {
 					memcpy(buffer_task.c_array() + 2 * sizeof(uint32_t), &first_row, sizeof(uint32_t));
 					asio::write(*sock, asio::buffer(buffer_task, 3 * sizeof(uint32_t)));
 
-					mLogger.println(format("%s - Receiving results") % client_address, Logger::DETAILED);
+					mLogger->println(format("%s - Receiving results") % client_address, Logger::DETAILED);
 					for (unsigned int col = task->col_from; col < task->col_to; ++col) {
 						for (unsigned int row = (col == task->col_from ? task->first_row : 0); row < mImageHeight; ++row) {
 							array<char, 4> buffer_result;
@@ -176,7 +179,7 @@ void Master::handle_connection(socket_ptr sock) {
 								mutex::scoped_lock lock(mTasksLock);
 								task->first_row++;
 							}
-							mLogger.incrementAndPrintProgressBar();
+							mLogger->incrementAndPrintProgressBar();
 						}
 						{
 							mutex::scoped_lock lock(mTasksLock);
@@ -185,13 +188,13 @@ void Master::handle_connection(socket_ptr sock) {
 						}
 					}
 
-					mLogger.println(format("%s - Partial task finished") % client_address, Logger::DETAILED);
+					mLogger->println(format("%s - Partial task finished") % client_address, Logger::DETAILED);
 					{
 						mutex::scoped_lock lock(mTasksLock);
 						task->state = PartialTask::FINISHED;
 					}
 				} catch (std::exception& e) {
-					mLogger.println(format("%s - Error while working on task, putting it back in the queue") % client_address, Logger::DETAILED);
+					mLogger->println(format("%s - Error while working on task, putting it back in the queue") % client_address, Logger::DETAILED);
 					{
 						mutex::scoped_lock lock(mTasksLock);
 						task->state = PartialTask::PENDING;
@@ -209,11 +212,11 @@ void Master::handle_connection(socket_ptr sock) {
 						}
 				}
 				if (task_finished) {
-					mLogger.println(format("%s - Closing connection") % client_address, Logger::DETAILED);
+					mLogger->println(format("%s - Closing connection") % client_address, Logger::DETAILED);
 					buffer_message[0] = CommProtocol::MSG_FINISHED;
 					asio::write(*sock, asio::buffer(buffer_message, sizeof(char)));
 				} else {
-					mLogger.println(format("%s - Waiting") % client_address, Logger::DETAILED);
+					mLogger->println(format("%s - Waiting") % client_address, Logger::DETAILED);
 					buffer_message[0] = CommProtocol::MSG_WAIT;
 					asio::write(*sock, asio::buffer(buffer_message, sizeof(char)));
 					this_thread::sleep(posix_time::seconds(2));
@@ -221,15 +224,15 @@ void Master::handle_connection(socket_ptr sock) {
 			}
 		}
 	} catch (std::exception& e) {
-		mLogger.println(e.what(), Logger::ERROR);
+		mLogger->println(e.what(), Logger::ERROR);
 	}
 }
 
 void Master::run() {
-	mLogger.println(format("Starting master on port %d...") % mPort, Logger::INFORMATIVE);
+	mLogger->println(format("Starting master on port %d...") % mPort, Logger::INFORMATIVE);
 
 	// create a queue with image parts
-	mLogger.println("Creating work queue", Logger::DETAILED);
+	mLogger->println("Creating work queue", Logger::DETAILED);
 	unsigned int col_width = mImageWidth / mWorkDivision;
 	for (unsigned int i = 0; i < mWorkDivision; ++i) {
 		pPartialTask part = pPartialTask(new PartialTask());
@@ -243,10 +246,10 @@ void Master::run() {
 	mWorkersList.clear();
 
 	// set up progress bar
-	mLogger.enableProgressBar(true);
-	mLogger.setProgressBarMax((long) mImageWidth * (long) mImageHeight);
-	mLogger.setProgressBarValue(0);
-	mLogger.printProgressBar();
+	mLogger->enableProgressBar(true);
+	mLogger->setProgressBarMax((long) mImageWidth * (long) mImageHeight);
+	mLogger->setProgressBarValue(0);
+	mLogger->printProgressBar();
 
 	// start accepting of connections
 	thread t(bind(&Master::accept_connections, this));

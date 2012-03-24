@@ -12,8 +12,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
+#include <boost/shared_ptr.hpp>
 
 using namespace std;
+using namespace boost;
 
 class Logger {
 public:
@@ -58,5 +60,7 @@ private:
 	long mProgressBar_LastValue;
 	long mProgressBar_Max;
 };
+
+typedef shared_ptr<Logger> pLogger;
 
 #endif /* LOGGER_H_ */
