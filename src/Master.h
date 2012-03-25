@@ -12,6 +12,8 @@
 #include "CommProtocol.h"
 #include "Task.h"
 
+#include <boost/thread.hpp>
+
 using namespace boost;
 using namespace std;
 
@@ -52,6 +54,19 @@ private:
 
 	void accept_connections();
 	void handle_connection(socket_ptr sock);
+
+	typedef array<char, sizeof(CommProtocol::HANDSHAKE)> array_handshake;
+
+	array_handshake protocol_get_handshake(socket_ptr sock, string client_address);
+	void protocol_check_handshake(string client_address, array_handshake handshake);
+	void protocol_initialize(socket_ptr sock, string client_address);
+	void protocol_upload_input_file(socket_ptr sock, string client_address);
+	void protocol_wait_for_acknowledgment(socket_ptr sock, string client_address);
+	void protocol_assignment_loop(socket_ptr sock, string client_address);
+	void protocol_assignment_loop_assign_task(socket_ptr sock, string client_address, pPartialTask task);
+	void protocol_assignment_loop_get_results(socket_ptr sock, string client_address, pPartialTask task);
+	void protocol_assignment_loop_send_finished(socket_ptr sock, string client_address);
+	void protocol_assignment_loop_send_wait(socket_ptr sock, string client_address);
 
 public:
 	Master(pLogger logger,
