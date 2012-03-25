@@ -70,6 +70,7 @@ void Slave::ResultSender::send_result(unsigned int col, unsigned int row, Color 
 	boost::mutex::scoped_lock lock(mObjectLock);
 
 	// put result in the queue
+	mLogger->println(boost::format("Queuing %dx%d, expecting %dx%d") % col % row % mExpectedCol % mExpectedRow, Logger::DETAILED);
 	mWaitingResults.push_back(Result(col, row, color));
 
 	// try to send as many results as possible
@@ -95,7 +96,7 @@ void Slave::ResultSender::send_result(unsigned int col, unsigned int row, Color 
 
 				// increment expected pixel
 				mExpectedRow++;
-				if (mExpectedRow > mImageHeight) {
+				if (mExpectedRow >= mImageHeight) {
 					mExpectedRow = 0;
 					mExpectedCol++;
 				}
@@ -230,7 +231,7 @@ void Slave::protocol_event_loop(socket_ptr sock, pTask task, uint32_t image_heig
 
 	bool finished = false;
 	while (!finished) {
-		char msg = protocol_event_loop_message(sock);
+		char msg = protocol_event_loop_get_message(sock);
 
 		switch(msg) {
 		case CommProtocol::MSG_FINISHED:
@@ -251,7 +252,7 @@ void Slave::protocol_event_loop(socket_ptr sock, pTask task, uint32_t image_heig
 	}
 }
 
-char Slave::protocol_event_loop_message(socket_ptr sock) {
+char Slave::protocol_event_loop_get_message(socket_ptr sock) {
 	boost::system::error_code error;
 	boost::array<char, 1> buffer_message;
 

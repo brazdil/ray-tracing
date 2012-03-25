@@ -175,6 +175,7 @@ void Master::protocol_assignment_loop(socket_ptr sock, string client_address) {
 		if (task) {
 			try {
 				protocol_assignment_loop_assign_task(sock, client_address, task);
+				protocol_assignment_loop_get_results(sock, client_address, task);
 				mLogger->println(format("%s - Partial task finished") % client_address, Logger::DETAILED);
 				{
 					mutex::scoped_lock lock(mTasksLock);

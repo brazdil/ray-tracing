@@ -79,7 +79,7 @@ private:
 	pBinaryData protocol_download_input_file(socket_ptr sock, uint32_t input_file_length);
 	pTask protocol_parse_input_file(socket_ptr sock, pBinaryData input_file);
 	void protocol_event_loop(socket_ptr sock, pTask task, uint32_t image_height);
-	char protocol_event_loop_message(socket_ptr sock);
+	char protocol_event_loop_get_message(socket_ptr sock);
 	void protocol_event_loop_get_task(socket_ptr sock, pTask task, uint32_t& col_from, uint32_t& col_to, uint32_t& first_row);
 	void protocol_event_loop_solve_task(socket_ptr sock, pTask task, uint32_t image_height, uint32_t col_from, uint32_t col_to, uint32_t first_row);
 
