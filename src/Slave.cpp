@@ -175,7 +175,6 @@ pBinaryData Slave::protocol_download_input_file(socket_ptr sock, uint32_t input_
 	mLogger->setProgressBarValue(0);
 	mLogger->printProgressBar(true);
 
-	boost::array<char, 1> buffer_message;
 	pBinaryData input_file = create_binary_data(input_file_length);
 	boost::array<char, 1024> buffer_input;
 	size_t input_file_fill = 0;
