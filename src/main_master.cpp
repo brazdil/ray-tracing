@@ -22,6 +22,7 @@ int main(int argc, const char** argv) {
 	unsigned int arg_division;
 	string arg_input;
 	string arg_output;
+	bool arg_realtime;
 
 	po::options_description desc;
 	desc.add_options()
@@ -32,6 +33,7 @@ int main(int argc, const char** argv) {
 	    ("work-division", po::value<unsigned int>(&arg_division)->default_value(32), "number of parts the work should be divided in")
 	    ("input-file", po::value<string>(&arg_input), "path to file with scene description")
     	("output-file", po::value<string>(&arg_output), "where to save the produced picture")
+    	("realtime", "show a window with realtime results")
     ;
 
 	po::positional_options_description pos_opt;
@@ -49,6 +51,8 @@ int main(int argc, const char** argv) {
 	    return EXIT_SUCCESS;
 	}
 
+	arg_realtime = var_map.count("realtime");
+
 	pLogger logger = pLogger(new Logger());
 	logger->setLevel(arg_log);
 	logger->setTitle("master");
@@ -59,7 +63,7 @@ int main(int argc, const char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	Master master(logger, arg_port, arg_width, arg_division, arg_input, arg_output);
+	Master master(logger, arg_port, arg_width, arg_division, arg_input, arg_output, arg_realtime);
 	master.run();
 
 	return EXIT_SUCCESS;

@@ -16,12 +16,14 @@ Master::Master(pLogger logger,
 		       unsigned int image_width,
 		       unsigned int work_division,
 		       string input_file,
-		       string output_file)
+		       string output_file,
+		       bool realtime)
 	: mLogger(logger),
 	  mPort(port),
 	  mOutputFile(output_file),
 	  mWorkDivision(work_division),
-	  mImageWidth(image_width) {
+	  mImageWidth(image_width),
+      mRealtime(realtime) {
 
 	if (mWorkDivision > mImageWidth)
 		mWorkDivision = mImageWidth;

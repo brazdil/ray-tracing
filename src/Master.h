@@ -43,6 +43,7 @@ private:
 	unsigned int mWorkDivision;
 	unsigned int mImageWidth;
 	unsigned int mImageHeight;
+	bool mRealtime;
 
 	pBinaryData mInputFile;
 
@@ -74,7 +75,8 @@ public:
 	       unsigned int image_width,
 	       unsigned int work_division,
 		   string input_file,
-		   string output_file);
+		   string output_file,
+		   bool realtime);
 	virtual ~Master();
 	void run();
 };
