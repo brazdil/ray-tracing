@@ -10,6 +10,7 @@
 
 #include "Camera.h"
 #include "Screen.h"
+#include "IObject.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -26,12 +27,15 @@ inline pBinaryData create_binary_data(long len) {
 class Task {
 	pCamera mCamera;
 	pScreen mScreen;
+	pIObject mObject;
+
 public:
 	Task(pBinaryData input_file);
 	virtual ~Task();
 
 	pCamera getCamera();
 	pScreen getScreen();
+	pIObject getObject();
 };
 
 typedef shared_ptr<Task> pTask;

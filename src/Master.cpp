@@ -318,7 +318,7 @@ void Master::run() {
 	mLogger->enableProgressBar(true);
 	mLogger->setProgressBarMax((long) mImageWidth * (long) mImageHeight);
 	mLogger->setProgressBarValue(0);
-	mLogger->printProgressBar();
+	mLogger->printProgressBar(true);
 
 	// start accepting of connections
 	thread t(bind(&Master::accept_connections, this));

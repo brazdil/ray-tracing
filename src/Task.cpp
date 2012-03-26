@@ -14,11 +14,10 @@
 #include "archive_entry.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
-#include "tinyxml2.h"
+#include "XML.h"
 
 using namespace boost;
 using namespace std;
-using namespace tinyxml2;
 
 pBinaryData extract_file(pBinaryData input_file, string filename) {
 	archive *file;
@@ -64,23 +63,14 @@ Task::Task(pBinaryData input_file) {
 	int error = xml_scene.Parse(file_xml_scene->data());
 	if (error != XML_SUCCESS)
 		throw runtime_error(str(format("Could not parse the scene description: %s") % xml_scene.GetErrorStr1()));
-
 	// Check root element's name - raytracing
 	XMLElement* xml_root = xml_scene.RootElement();
 	if (!xml_root || !XMLUtil::StringEqual(xml_root->Name(), "raytracing"))
 		throw runtime_error("The input file does not contain scene description");
 
-	// Parse camera
-	XMLElement* xml_elem_camera = xml_root->FirstChildElement("camera");
-	if (!xml_elem_camera)
-		throw runtime_error("Scene description doesn't contain camera information");
-	mCamera = pCamera(new Camera(xml_elem_camera));
-
-	// Parse screen
-	XMLElement* xml_elem_screen = xml_root->FirstChildElement("screen");
-	if (!xml_elem_screen)
-		throw runtime_error("Scene description doesn't contain screen information");
-	mScreen = pScreen(new Screen(mCamera, xml_elem_screen));
+	mCamera = XML::parseCamera(xml_root);
+	mScreen = XML::parseScreen(xml_root, mCamera);
+	mObject = XML::parseObjects(xml_root);
 }
 
 Task::~Task() {
@@ -93,4 +83,8 @@ pCamera Task::getCamera() {
 
 pScreen Task::getScreen() {
 	return mScreen;
+}
+
+pIObject Task::getObject() {
+	return mObject;
 }

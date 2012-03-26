@@ -13,40 +13,6 @@ Screen::Screen(pCamera camera, double distance, Ratio aspect_ratio, Color backgr
 	init();
 }
 
-Screen::Screen(pCamera camera, tinyxml2::XMLElement* xml)
-	: mCamera(camera), mAspectRatio(0,1) {
-	// Check the element name
-	if (!xml || !XMLUtil::StringEqual(xml->Name(), "screen"))
-		throw std::invalid_argument("Not a \"screen\" element");
-
-	// Get distance
-	XMLElement* elem_distance = xml->FirstChildElement("distance");
-	if (!elem_distance)
-		throw std::invalid_argument("Screen description doesn't contain distance");
-	mDistance = parseDoubleValue(elem_distance);
-
-	// Get aspect-ratio
-	XMLElement* elem_aspectratio = xml->FirstChildElement("aspect-ratio");
-	if (!elem_aspectratio)
-		throw std::invalid_argument("Camera description doesn't contain aspect-ratio");
-	XMLElement* elem_aspectratio_ratio = elem_aspectratio->FirstChildElement("ratio");
-	if (!elem_aspectratio_ratio)
-		throw std::invalid_argument("Camera description doesn't contain aspect-ratio");
-	mAspectRatio = Ratio(elem_aspectratio_ratio);
-
-	// Get background-color
-	XMLElement* elem_backgroundcolor = xml->FirstChildElement("background-color");
-	if (!elem_backgroundcolor)
-		throw std::invalid_argument("Camera description doesn't contain background-color");
-	XMLElement* elem_backgroundcolor_color = elem_backgroundcolor->FirstChildElement("color");
-	if (!elem_backgroundcolor_color)
-		throw std::invalid_argument("Camera description doesn't contain background-color");
-	mBackgroundColor = Color(elem_backgroundcolor_color);
-
-	// Initialize screen
-	init();
-}
-
 void Screen::init() {
 	if (mDistance <= 0.0)
 		throw std::invalid_argument("Distance has to be positive");

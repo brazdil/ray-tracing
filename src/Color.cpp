@@ -24,19 +24,6 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b)
 	init();
 }
 
-Color::Color(tinyxml2::XMLElement* elem) {
-	// Check the element's name
-	if (!elem || !tinyxml2::XMLUtil::StringEqual(elem->Name(), "color"))
-		throw std::invalid_argument("Not a \"color\" element");
-
-	// Get the values
-	mR = (double) parseUnsignedIntegerAttribute("r", elem) / 255.0f;
-	mG = (double) parseUnsignedIntegerAttribute("g", elem) / 255.0f;
-	mB = (double) parseUnsignedIntegerAttribute("b", elem) / 255.0f;
-
-	init();
-}
-
 void Color::init() {
 	if (mR < 0.0 || mR > 1.0 ||
 		mG < 0.0 || mG > 1.0 ||

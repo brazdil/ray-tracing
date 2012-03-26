@@ -16,42 +16,6 @@ Camera::Camera(const Vector3d& position, const Vector3d& look_at, double field_o
 	init();
 }
 
-Camera::Camera(XMLElement* xml) {
-	// Check the element name
-	if (!xml || !XMLUtil::StringEqual(xml->Name(), "camera"))
-		throw std::invalid_argument("Not a \"camera\" element");
-
-	// Get position
-	XMLElement* elem_position = xml->FirstChildElement("position");
-	if (!elem_position)
-		throw std::invalid_argument("Camera description doesn't contain position");
-	XMLElement* elem_position_vector = elem_position->FirstChildElement("vector3");
-	if (!elem_position_vector)
-		throw std::invalid_argument("Camera description doesn't contain position vector");
-	mPosition = parseVector3d(elem_position_vector);
-
-	// Get look-at
-	XMLElement* elem_lookat = xml->FirstChildElement("look-at");
-	if (!elem_lookat)
-		throw std::invalid_argument("Camera description doesn't contain look-at");
-	XMLElement* elem_lookat_vector = elem_lookat->FirstChildElement("vector3");
-	if (!elem_lookat_vector)
-		throw std::invalid_argument("Camera description doesn't contain look-at vector");
-	mLookAt = parseVector3d(elem_lookat_vector);
-
-	// Get field-of-view
-	XMLElement* elem_fov = xml->FirstChildElement("field-of-view");
-	if (!elem_fov)
-		throw std::invalid_argument("Camera description doesn't contain field-of-view");
-	XMLElement* elem_fov_angle = elem_fov->FirstChildElement("angle");
-	if (!elem_fov_angle)
-		throw std::invalid_argument("Camera description doesn't contain field-of-view angle");
-	mFieldOfView = parseAngle(elem_fov_angle);
-
-	// Initialize camera
-	init();
-}
-
 void Camera::init() {
 	if ((mFieldOfView <= 0.0) || (mFieldOfView >= M_PI))
 		throw std::invalid_argument("Viewing angle has to be between 0 and pi");
@@ -82,9 +46,9 @@ void Camera::init() {
 
 	// (ii) Align the vector in yz plane with z axis
 
-	double direction_yz_x = direction_yz.dot(Vector3d::UnitX());
-	double direction_yz_y = direction_yz.dot(Vector3d::UnitY());
-	double direction_yz_z = direction_yz.dot(Vector3d::UnitZ());
+	double direction_yz_x = direction_yz.data()[0];
+	double direction_yz_y = direction_yz.data()[1];
+	double direction_yz_z = direction_yz.data()[2];
 
 	if (!isZero(direction_yz_x))
 		throw std::runtime_error("Failed to rotate the direction vector into yz plane");

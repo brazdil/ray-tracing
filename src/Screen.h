@@ -16,9 +16,9 @@ using namespace Eigen;
 using namespace boost;
 
 #include "Camera.h"
+#include "Screen.h"
 #include "Ratio.h"
 #include "Color.h"
-#include "tinyxml2.h"
 
 /*
  * CScreen represents the screen rectangle. It contains the position of the top-left corner of the screen
@@ -43,7 +43,6 @@ private:
 public:
 
 	Screen(pCamera camera, double distance, Ratio aspect_ratio, Color background_color);
-	Screen(pCamera camera, tinyxml2::XMLElement* elem);
 	virtual ~Screen();
 
 	pCamera getCamera() const;

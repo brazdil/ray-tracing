@@ -21,7 +21,6 @@ public:
 	Color();
 	Color(float r, float g, float b);
 	Color(unsigned char r, unsigned char g, unsigned char b);
-	Color(tinyxml2::XMLElement* elem);
 	virtual ~Color();
 
 	unsigned char getUnsignedCharRed();

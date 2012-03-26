@@ -11,9 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 #include "utils.h"
-#include "tinyxml2.h"
 using namespace boost;
-using namespace tinyxml2;
 
 class Camera {
 private:
@@ -32,7 +30,6 @@ public:
 
 	Camera();
 	Camera(const Vector3d& position, const Vector3d& look_at, double field_of_view);
-	Camera(XMLElement* xml);
 	virtual ~Camera();
 
     Vector3d getDirection() const;
