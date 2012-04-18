@@ -33,10 +33,11 @@ if not conf.CheckPKG('eigen3 >= 3.0.5'):
 
 # Build
 
+compile_append = ' -g '
+
 boost_dir = ARGUMENTS.get('boost-dir', '')
-boost_append = ''
 if boost_dir:
-	boost_append = '-I' + boost_dir
+	compile_append += '-I' + boost_dir
 
 env.ParseConfig('pkg-config --cflags eigen3')
 
@@ -46,19 +47,20 @@ source_common = [ filename for filename in source_all
                      (not '_test' in filename) and
                      (not 'src/Master.cpp' in filename) and
                      (not 'src/Slave.cpp' in filename) and
-                     (not 'src/ResultManager.cpp' in filename) ]
-source_master = ['src/main_master.cpp', 'src/Master.cpp', 'src/ResultManager.cpp']
+                     (not 'src/ResultManager.cpp' in filename) and
+                     (not 'src/SDL_rotozoom.c' in filename) ]
+source_master = ['src/main_master.cpp', 'src/Master.cpp', 'src/ResultManager.cpp', 'src/SDL_rotozoom.c']
 source_slave = ['src/main_slave.cpp', 'src/Slave.cpp']
 
-includes_master = boost_append + ' `pkg-config --cflags sdl` '
-includes_slave = boost_append + '';
+includes_master = compile_append + ' `pkg-config --cflags sdl` '
+includes_slave = compile_append + '';
 
-name_lib_common = 'raytracing-common'
+name_lib_common = 'raytracing-shared'
 libs_common = [name_lib_common, 'archive', 'boost_system', 'boost_thread', 'boost_program_options'];
-libs_master = libs_common + ['SDL', 'SDL_gfx']
+libs_master = libs_common + ['SDL']
 libs_slave = libs_common
 
-env.StaticLibrary(name_lib_common, source_common)
+env.SharedLibrary(name_lib_common, source_common)
 program_slave = env.Program('slave', source_slave, LIBS = libs_slave, CCFLAGS = includes_slave, LIBPATH = '.')
 program_master = env.Program('master', source_master, LIBS = libs_master, CCFLAGS = includes_master, LIBPATH = '.')
 

@@ -36,7 +36,7 @@ void Logger::setLevel(int level) {
 		mMaxLevel = level;
 }
 
-void Logger::setTitle(string title) {
+void Logger::setTitle(std::string title) {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	mTitle = title;
 }
@@ -72,7 +72,7 @@ void Logger::println(boost::basic_format<char> format, MessageImportance level) 
 	println(boost::str(format), level);
 }
 
-void Logger::println(string message, MessageImportance level) {
+void Logger::println(std::string message, MessageImportance level) {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (level <= mMaxLevel) {
 		clearProgressBar();

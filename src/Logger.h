@@ -33,10 +33,10 @@ public:
 	int  getLevel();
 	void setLevel(int level);
 
-	void setTitle(string title);
+	void setTitle(std::string title);
 
 	void println(boost::basic_format<char> format, MessageImportance level);
-	void println(string message, MessageImportance level);
+	void println(std::string message, MessageImportance level);
 
 	void enableProgressBar(bool value);
 	void setProgressBarValue(long value);
