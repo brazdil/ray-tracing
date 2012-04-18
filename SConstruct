@@ -33,7 +33,7 @@ if not conf.CheckPKG('eigen3 >= 3.0.5'):
 
 # Build
 
-compile_append = ' -g '
+compile_append = '  '
 
 boost_dir = ARGUMENTS.get('boost-dir', '')
 if boost_dir:
@@ -52,15 +52,16 @@ source_common = [ filename for filename in source_all
 source_master = ['src/main_master.cpp', 'src/Master.cpp', 'src/ResultManager.cpp', 'src/SDL_rotozoom.c']
 source_slave = ['src/main_slave.cpp', 'src/Slave.cpp']
 
+includes_common = compile_append;
 includes_master = compile_append + ' `pkg-config --cflags sdl` '
-includes_slave = compile_append + '';
+includes_slave = compile_append;
 
 name_lib_common = 'raytracing-shared'
 libs_common = [name_lib_common, 'archive', 'boost_system', 'boost_thread', 'boost_program_options'];
 libs_master = libs_common + ['SDL']
 libs_slave = libs_common
 
-env.SharedLibrary(name_lib_common, source_common)
+env.SharedLibrary(name_lib_common, source_common, CCFLAGS = includes_common)
 program_slave = env.Program('slave', source_slave, LIBS = libs_slave, CCFLAGS = includes_slave, LIBPATH = '.')
 program_master = env.Program('master', source_master, LIBS = libs_master, CCFLAGS = includes_master, LIBPATH = '.')
 
