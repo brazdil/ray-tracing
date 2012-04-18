@@ -1,0 +1,25 @@
+<raytracing>
+	<camera>
+		<position><vector3 x="-1.0" y="2.0" z="-5.0" /></position>
+		<look-at><vector3 x="-4.0" y="1.0" z="5.0" /></look-at>
+		<field-of-view><angle units="deg" value="60" /></field-of-view>
+	</camera>
+	<screen>
+		<distance><double value="8.571628677317875" /></distance>
+		<aspect-ratio><ratio numerator="16" denominator="9" /></aspect-ratio>
+		<background-color><color r="012" g="123" b="234" /></background-color>
+	</screen>
+	<materials>
+	</materials>
+	<lights>
+	</lights>
+	<objects>
+		<composite>
+			<sphere>
+				<center><vector3 x="-0.5" y="0.6" z="4" /></center>
+				<radius><double value="0.6" /></radius>
+				<material id="glossy_black" />
+			</sphere>
+		</composite>
+	</objects>
+</raytracing>

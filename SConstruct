@@ -1,7 +1,8 @@
 env = Environment()
 
 env.ParseConfig('pkg-config --cflags eigen3')
-env.Append(LIBS = ['archive', 'boost_system', 'boost_thread', 'boost_program_options'])
+env.ParseConfig('pkg-config --cflags --libs sdl')
+env.Append(LIBS = ['archive', 'boost_system', 'boost_thread', 'boost_program_options', 'SDL_gfx'])
 
 boost_dir = ARGUMENTS.get('boost-dir', '')
 if boost_dir:

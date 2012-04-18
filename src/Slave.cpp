@@ -128,7 +128,8 @@ Slave::~Slave() {
 void Slave::compute_pixel(socket_ptr sock, pTask task, pThreadSemaphore thread_semaphore, pResultSender result_sender, unsigned int col, unsigned int row) {
 	mLogger->println(boost::format("Computing %dx%d") % col % row, Logger::DETAILED);
 	boost::this_thread::sleep(boost::posix_time::seconds(1));
-	result_sender->send_result(col, row, Color((unsigned char) 012, (unsigned char) 123, (unsigned char) 234));
+	// result_sender->send_result(col, row, Color((unsigned char) 219, (unsigned char) 232, (unsigned char) 212));
+	result_sender->send_result(col, row, Color((unsigned char) 0, (unsigned char) 0, (unsigned char) 255));
 	mLogger->incrementAndPrintProgressBar();
 	thread_semaphore->release();
 }

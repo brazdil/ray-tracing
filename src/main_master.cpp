@@ -22,7 +22,7 @@ int main(int argc, const char** argv) {
 	unsigned int arg_division;
 	string arg_input;
 	string arg_output;
-	bool arg_realtime;
+	unsigned int arg_realtime;
 
 	po::options_description desc;
 	desc.add_options()
@@ -33,7 +33,7 @@ int main(int argc, const char** argv) {
 	    ("work-division", po::value<unsigned int>(&arg_division)->default_value(32), "number of parts the work should be divided in")
 	    ("input-file", po::value<string>(&arg_input), "path to file with scene description")
     	("output-file", po::value<string>(&arg_output), "where to save the produced picture")
-    	("realtime", "show a window with realtime results")
+    	("realtime", po::value<unsigned int>(&arg_realtime)->default_value(1), "interval of realtime updates in seconds, 0 = off")
     ;
 
 	po::positional_options_description pos_opt;
@@ -50,8 +50,6 @@ int main(int argc, const char** argv) {
 	    cout << desc << std::endl;
 	    return EXIT_SUCCESS;
 	}
-
-	arg_realtime = var_map.count("realtime");
 
 	pLogger logger = pLogger(new Logger());
 	logger->setLevel(arg_log);

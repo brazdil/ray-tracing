@@ -17,7 +17,7 @@ Master::Master(pLogger logger,
 		       unsigned int work_division,
 		       string input_file,
 		       string output_file,
-		       bool realtime)
+		       unsigned int realtime)
 	: mLogger(logger),
 	  mPort(port),
 	  mOutputFile(output_file),
@@ -53,9 +53,12 @@ Master::Master(pLogger logger,
 	}
 	Task task(mInputFile);
 
-	// Compute height from scene data
+	// compute height from scene data
 	Ratio aspect_ratio = task.getScreen()->getAspectRatio();
 	mImageHeight = mImageWidth * aspect_ratio.getDenominator() / aspect_ratio.getNumerator();
+
+	// create ResultManager
+	mResultManager = pResultManager(new ResultManager(mImageWidth, mImageHeight, mRealtime));
 }
 
 Master::~Master() {
@@ -252,6 +255,7 @@ void Master::protocol_assignment_loop_get_results(socket_ptr sock, string client
 				task->first_row++;
 			}
 
+			mResultManager->setPixel(col, row, (unsigned char) buffer_result[1], (unsigned char) buffer_result[2], (unsigned char) buffer_result[3]);
 			mLogger->incrementAndPrintProgressBar();
 		}
 		{
@@ -321,6 +325,10 @@ void Master::run() {
 	mLogger->setProgressBarMax((long) mImageWidth * (long) mImageHeight);
 	mLogger->setProgressBarValue(0);
 	mLogger->printProgressBar(true);
+
+	// start realtime window
+	if (mRealtime)
+		mResultManager->startWindow();
 
 	// start accepting of connections
 	thread t(bind(&Master::accept_connections, this));

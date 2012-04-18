@@ -11,6 +11,7 @@
 #include "Logger.h"
 #include "CommProtocol.h"
 #include "Task.h"
+#include "ResultManager.h"
 
 #include <boost/thread.hpp>
 
@@ -43,7 +44,7 @@ private:
 	unsigned int mWorkDivision;
 	unsigned int mImageWidth;
 	unsigned int mImageHeight;
-	bool mRealtime;
+	unsigned int mRealtime;
 
 	pBinaryData mInputFile;
 
@@ -52,6 +53,8 @@ private:
 
 	mutex mWorkersLock;
 	vector<pThread> mWorkersList;
+
+	pResultManager mResultManager;
 
 	void accept_connections();
 	void handle_connection(socket_ptr sock);
@@ -76,7 +79,7 @@ public:
 	       unsigned int work_division,
 		   string input_file,
 		   string output_file,
-		   bool realtime);
+		   unsigned int realtime);
 	virtual ~Master();
 	void run();
 };
