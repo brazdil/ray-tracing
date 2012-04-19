@@ -8,9 +8,9 @@
 #ifndef SLAVE_H_
 #define SLAVE_H_
 
-#include "Logger.h"
-#include "CommProtocol.h"
-#include "Task.h"
+#include "../common/Logger.h"
+#include "../common/CommProtocol.h"
+#include "../common/Task.h"
 
 #include <boost/utility.hpp>
 #include <boost/thread/condition.hpp>

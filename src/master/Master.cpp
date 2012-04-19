@@ -354,4 +354,7 @@ void Master::run() {
 		(*it)->join();
 	}
 	mutex::scoped_lock lock_tasks(mTasksLock);
+
+	// save result
+	mResultManager->saveResult(mOutputFile);
 }

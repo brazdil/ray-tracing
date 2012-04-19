@@ -8,9 +8,9 @@
 #ifndef MASTER_H_
 #define MASTER_H_
 
-#include "Logger.h"
-#include "CommProtocol.h"
-#include "Task.h"
+#include "../common/Logger.h"
+#include "../common/CommProtocol.h"
+#include "../common/Task.h"
 #include "ResultManager.h"
 
 #include <boost/thread.hpp>

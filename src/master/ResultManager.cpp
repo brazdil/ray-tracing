@@ -24,7 +24,9 @@ ResultManager::ResultManager(unsigned int image_width, unsigned int image_height
 	    if (mResultSDL == NULL)
 			throw std::runtime_error(str(format("Unable to initialize SDL surface with size %dx%d") % mImageWidth % mImageHeight));
 	} else {
-		mResultPlain = new unsigned char[mImageWidth * mImageHeight * 3];
+		mResultBMP = pBMP(new BMP());
+		mResultBMP->SetBitDepth(24);
+		mResultBMP->SetSize(mImageWidth, mImageHeight);
 	}
 }
 
@@ -38,9 +40,6 @@ ResultManager::~ResultManager() {
 			mWindowThread->join();
 		}
 		SDL_Quit();
-	} else {
-		if (mResultPlain)
-			delete[] mResultPlain;
 	}
 }
 
@@ -151,9 +150,19 @@ void ResultManager::setPixel(unsigned int x, unsigned int y, unsigned char r, un
 		pixels[pixel_offset + 3] = 0xFF;
 		SDL_UnlockSurface(mResultSDL);
 	} else {
-		unsigned int pixel_offset = (mImageWidth * y + x) * 3;
-		mResultPlain[pixel_offset + 0] = r;
-		mResultPlain[pixel_offset + 1] = g;
-		mResultPlain[pixel_offset + 2] = b;
+		RGBApixel color;
+		color.Red = r;
+		color.Green = g;
+		color.Blue = b;
+		color.Alpha = 255;
+		mResultBMP->SetPixel(x, y, color);
+	}
+}
+
+void ResultManager::saveResult(std::string filename) {
+	if (mUseSDL) {
+		SDL_SaveBMP(mResultSDL, filename.c_str());
+	} else {
+		mResultBMP->WriteToFile(filename.c_str());
 	}
 }

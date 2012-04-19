@@ -41,27 +41,30 @@ if boost_dir:
 
 env.ParseConfig('pkg-config --cflags eigen3')
 
-source_all = [ file.rstr() for file in Glob('src/*.cpp') ]
-source_common = [ filename for filename in source_all 
-                  if (not 'src/main_' in filename) and 
-                     (not '_test' in filename) and
-                     (not 'src/Master.cpp' in filename) and
-                     (not 'src/Slave.cpp' in filename) and
-                     (not 'src/ResultManager.cpp' in filename) and
-                     (not 'src/SDL_rotozoom.c' in filename) ]
-source_master = ['src/main_master.cpp', 'src/Master.cpp', 'src/ResultManager.cpp', 'src/SDL_rotozoom.c']
-source_slave = ['src/main_slave.cpp', 'src/Slave.cpp']
+source_common = Glob('src/common/*.cpp')
+source_master = Glob('src/master/*.cpp') + Glob('src/master/*.c')
+source_slave = Glob('src/slave/*.cpp')
+source_easybmp = Glob('src/easybmp/*.cpp')
+source_sdl_gfx = Glob('src/sdl_gfx/*.c')
 
+includes_sdl = ' `pkg-config --cflags sdl` '
+includes_sdl_gfx = includes_sdl;
 includes_common = compile_append;
-includes_master = compile_append + ' `pkg-config --cflags sdl` '
+includes_master = compile_append + includes_sdl
 includes_slave = compile_append;
 
 name_lib_common = 'raytracing-shared'
+name_lib_easybmp = 'easybmp'
+name_lib_sdl_gfx = 'sdl_gfx'
+
 libs_common = [name_lib_common, 'archive', 'boost_system', 'boost_thread', 'boost_program_options'];
-libs_master = libs_common + ['SDL']
+libs_master = libs_common + ['SDL', name_lib_easybmp, name_lib_sdl_gfx]
 libs_slave = libs_common
 
+env.StaticLibrary(name_lib_easybmp, source_easybmp)
+env.StaticLibrary(name_lib_sdl_gfx, source_sdl_gfx, CCFLAGS = includes_sdl_gfx)
 env.StaticLibrary(name_lib_common, source_common, CCFLAGS = includes_common)
+
 program_slave = env.Program('slave', source_slave, LIBS = libs_slave, CCFLAGS = includes_slave, LIBPATH = '.')
 program_master = env.Program('master', source_master, LIBS = libs_master, CCFLAGS = includes_master, LIBPATH = '.')
 

@@ -9,7 +9,8 @@
 #define SDLWINDOW_H_
 
 #include "SDL.h"
-#include "SDL_rotozoom.h"
+#include "../sdl_gfx/SDL_rotozoom.h"
+#include "../easybmp/EasyBMP.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -17,6 +18,8 @@
 #include <boost/thread.hpp>
 
 using namespace boost;
+
+typedef shared_ptr<BMP> pBMP;
 
 class ResultManager {
 private:
@@ -35,7 +38,7 @@ private:
 	mutex mResultMutex;
 	const unsigned int mImageWidth, mImageHeight;
 	SDL_Surface *mResultSDL;
-	unsigned char *mResultPlain;
+	pBMP mResultBMP;
 
 	inline bool fitsInWindow();
 	inline bool needsToFitHeight();
@@ -48,6 +51,7 @@ public:
 
 	void startWindow();
 	void setPixel(unsigned int x, unsigned int y, unsigned char r, unsigned char g, unsigned char b);
+	void saveResult(std::string filename);
 };
 
 typedef shared_ptr<ResultManager> pResultManager;
