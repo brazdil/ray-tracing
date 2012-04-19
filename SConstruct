@@ -61,7 +61,7 @@ libs_common = [name_lib_common, 'archive', 'boost_system', 'boost_thread', 'boos
 libs_master = libs_common + ['SDL']
 libs_slave = libs_common
 
-env.SharedLibrary(name_lib_common, source_common, CCFLAGS = includes_common)
+env.StaticLibrary(name_lib_common, source_common, CCFLAGS = includes_common)
 program_slave = env.Program('slave', source_slave, LIBS = libs_slave, CCFLAGS = includes_slave, LIBPATH = '.')
 program_master = env.Program('master', source_master, LIBS = libs_master, CCFLAGS = includes_master, LIBPATH = '.')
 
