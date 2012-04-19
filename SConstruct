@@ -35,9 +35,9 @@ if not conf.CheckPKG('eigen3 >= 3.0.5'):
 
 compile_append = '  '
 
-boost_dir = ARGUMENTS.get('boost-dir', '')
-if boost_dir:
-	compile_append += '-I' + boost_dir
+# boost_dir = ARGUMENTS.get('boost-dir', '')
+# if boost_dir:
+# 	compile_append += '-I' + boost_dir
 
 env.ParseConfig('pkg-config --cflags eigen3')
 
