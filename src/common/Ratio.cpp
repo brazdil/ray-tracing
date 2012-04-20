@@ -19,15 +19,15 @@ Ratio::~Ratio() {
 
 }
 
-unsigned int Ratio::getNumerator() {
+unsigned int Ratio::getNumerator() const {
 	return mNumerator;
 }
 
-unsigned int Ratio::getDenominator() {
+unsigned int Ratio::getDenominator() const {
 	return mDenominator;
 }
 
-double Ratio::getDouble() {
+double Ratio::getDouble() const {
 	return (double) mNumerator / (double) mDenominator;
 }
 

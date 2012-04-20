@@ -22,8 +22,8 @@ public:
 	BoundingBox(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
 	virtual ~BoundingBox();
 
-	BoundingBox merge(BoundingBox& another);
-	bool intersects(Ray& ray);
+	BoundingBox merge(const BoundingBox& another) const;
+	bool intersects(const Ray& ray) const;
 };
 
 #endif /* BOUNDINGBOX_H_ */

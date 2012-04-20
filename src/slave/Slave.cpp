@@ -125,12 +125,19 @@ Slave::Slave(pLogger logger, string host, unsigned short port, unsigned int max_
 Slave::~Slave() {
 }
 
-void Slave::compute_pixel(socket_ptr sock, pTask task, pThreadSemaphore thread_semaphore, pResultSender result_sender, unsigned int col, unsigned int row) {
+void Slave::compute_pixel(socket_ptr sock, pTask task, pThreadSemaphore thread_semaphore, pResultSender result_sender, unsigned int col, unsigned int row, unsigned int image_width) {
 	mLogger->println(boost::format("Computing %dx%d") % col % row, Logger::DETAILED);
-	boost::this_thread::sleep(boost::posix_time::seconds(1));
-	// result_sender->send_result(col, row, Color((unsigned char) 219, (unsigned char) 232, (unsigned char) 212));
-	result_sender->send_result(col, row, Color((unsigned char) 0, (unsigned char) 0, (unsigned char) 255));
-	mLogger->incrementAndPrintProgressBar();
+
+	Color result = task->getScreen()->getBackgroundColor();
+	try {
+		result = task->getObject()->getColorAtIntersection(
+			task->getScreen()->getRay(image_width, col, row));
+	} catch (IObject::no_intersection_exception&) {
+		// no need to handle
+	}
+
+	result_sender->send_result(col, row, result);
+//	mLogger->incrementAndPrintProgressBar();
 	thread_semaphore->release();
 }
 
@@ -223,7 +230,7 @@ pTask Slave::protocol_parse_input_file(socket_ptr sock, pBinaryData input_file) 
 	return task;
 }
 
-void Slave::protocol_event_loop(socket_ptr sock, pTask task, uint32_t image_height) {
+void Slave::protocol_event_loop(socket_ptr sock, pTask task, uint32_t image_width, uint32_t image_height) {
 	mLogger->println(boost::format("Entering task loop"), Logger::DETAILED);
 
 	uint32_t col_from;
@@ -245,7 +252,7 @@ void Slave::protocol_event_loop(socket_ptr sock, pTask task, uint32_t image_heig
 		case CommProtocol::MSG_TASK:
 			mLogger->println(boost::format("Awaiting task"), Logger::DETAILED);
 			protocol_event_loop_get_task(sock, task, col_from, col_to, first_row);
-			protocol_event_loop_solve_task(sock, task, image_height, col_from, col_to, first_row);
+			protocol_event_loop_solve_task(sock, task, image_width, image_height, col_from, col_to, first_row);
 			break;
 		default:
 			throw std::runtime_error(boost::str(boost::format("Unknown message from master")));
@@ -287,24 +294,24 @@ void Slave::protocol_event_loop_get_task(socket_ptr sock, pTask task, uint32_t& 
 	first_row = ntohl(first_row);
 }
 
-void Slave::protocol_event_loop_solve_task(socket_ptr sock, pTask task, uint32_t image_height, uint32_t col_from, uint32_t col_to, uint32_t first_row) {
+void Slave::protocol_event_loop_solve_task(socket_ptr sock, pTask task, uint32_t image_width, uint32_t image_height, uint32_t col_from, uint32_t col_to, uint32_t first_row) {
 	pThreadSemaphore thread_semaphore = pThreadSemaphore(new ThreadSemaphore(mMaxThreads));
 	pResultSender result_sender = pResultSender(new ResultSender(mLogger, sock, image_height, col_from, first_row, mMaxThreads));
 
 	mLogger->println(boost::format("Solving task: %d-%d") % col_from % (col_to - 1), Logger::INFORMATIVE);
-	mLogger->enableProgressBar(true);
-	mLogger->setProgressBarMax((col_to - col_from) * image_height - first_row);
-	mLogger->setProgressBarValue(0);
+//	mLogger->enableProgressBar(true);
+//	mLogger->setProgressBarMax((col_to - col_from) * image_height - first_row);
+//	mLogger->setProgressBarValue(0);
 
 	for (unsigned int col = col_from; col < col_to; ++col) {
 		for (unsigned int row = (col == col_from ? first_row : 0); row < image_height; ++row) {
 			thread_semaphore->acquire();
-			boost::thread t(boost::bind(&Slave::compute_pixel, this, sock, task, thread_semaphore, result_sender, col, row));
+			boost::thread t(boost::bind(&Slave::compute_pixel, this, sock, task, thread_semaphore, result_sender, col, row, image_width));
 		}
 	}
 
 	thread_semaphore->wait_and_reset(); 	// wait for everyone to finish
-	mLogger->enableProgressBar(false);
+//	mLogger->enableProgressBar(false);
 }
 
 void Slave::run() {
@@ -333,7 +340,9 @@ void Slave::run() {
 			pBinaryData input_file = protocol_download_input_file(sock, input_file_length);
 			task = protocol_parse_input_file(sock, input_file);
 		}
-		protocol_event_loop(sock, task, image_height);
+		if (image_height != task->getScreen()->getImageHeight(image_width))
+			throw std::runtime_error("Image height doesn't fit what server claims");
+		protocol_event_loop(sock, task, image_width, image_height);
 
 	} catch (std::exception& e) {
 		mLogger->println(e.what(), Logger::ERROR);

@@ -128,28 +128,28 @@ pIObject XML::parseObjects(XMLElement* xml_root) {
 	if (!xml_elem_objects)
 		throw std::runtime_error("Scene description doesn't contain objects information");
 
-	XMLElement* xml_elem_composite = xml_elem_objects->FirstChildElement("composite");
+	XMLElement* xml_elem_composite = xml_elem_objects->FirstChildElement("union");
 	if (!xml_elem_composite)
-		throw std::runtime_error("Objects part of XML needs to contain a composite first");
+		throw std::runtime_error("Objects part of XML needs to contain a union first");
 
-	return parseComposite(xml_elem_composite);
+	return parseUnion(xml_elem_composite);
 }
 
-pIObject XML::parseComposite(XMLElement* xml_elem_composite) {
+pIObject XML::parseUnion(XMLElement* xml_elem_composite) {
 	vector<pIObject> sub_objects;
 
 	XMLElement* xml_sub_elem = xml_elem_composite->FirstChildElement();
 	while (xml_sub_elem) {
 
-		if (XMLUtil::StringEqual(xml_sub_elem->Name(), "composite"))
-			sub_objects.push_back(parseComposite(xml_sub_elem));
+		if (XMLUtil::StringEqual(xml_sub_elem->Name(), "union"))
+			sub_objects.push_back(parseUnion(xml_sub_elem));
 		else if (XMLUtil::StringEqual(xml_sub_elem->Name(), "sphere"))
 			sub_objects.push_back(parseSphere(xml_sub_elem));
 
 		xml_sub_elem = xml_sub_elem->NextSiblingElement();
 	}
 
-	return pIObject(new Composite(sub_objects));
+	return pIObject(new Union(sub_objects));
 }
 
 pIObject XML::parseSphere(XMLElement* xml_elem_sphere) {

@@ -54,8 +54,7 @@ Master::Master(pLogger logger,
 	Task task(mInputFile);
 
 	// compute height from scene data
-	Ratio aspect_ratio = task.getScreen()->getAspectRatio();
-	mImageHeight = mImageWidth * aspect_ratio.getDenominator() / aspect_ratio.getNumerator();
+	mImageHeight = task.getScreen()->getImageHeight(mImageWidth);
 
 	// create ResultManager
 	mResultManager = pResultManager(new ResultManager(mImageWidth, mImageHeight, mRealtime));

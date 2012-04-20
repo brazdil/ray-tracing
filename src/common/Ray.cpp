@@ -53,55 +53,55 @@ Ray::Ray(const Vector3d& origin, const Vector3d& direction)
 Ray::~Ray() {
 }
 
-double Ray::x() {
+double Ray::x() const {
 	return _x;
 }
 
-double Ray::y() {
+double Ray::y() const {
 	return _y;
 }
 
-double Ray::z() {
+double Ray::z() const {
 	return _z;
 }
 
-double Ray::i() {
+double Ray::i() const {
 	return _i;
 }
 
-double Ray::j() {
+double Ray::j() const {
 	return _j;
 }
 
-double Ray::k() {
+double Ray::k() const {
 	return _k;
 }
 
-double Ray::R0() {
+double Ray::R0() const {
 	return _R0;
 }
 
-double Ray::R1() {
+double Ray::R1() const {
 	return _R1;
 }
 
-double Ray::R3() {
+double Ray::R3() const {
 	return _R3;
 }
 
-const Vector3d& Ray::getOrigin() {
+const Vector3d& Ray::getOrigin() const {
 	return mOrigin;
 }
 
-const Vector3d& Ray::getDirection() {
+const Vector3d& Ray::getDirection() const {
 	return mDirection;
 }
 
-Ray::Classification Ray::getClassification() {
+Ray::Classification Ray::getClassification() const {
 	return mClassification;
 }
 
-Vector3d Ray::getPointOnRay(double multiplier) {
+Vector3d Ray::getPointOnRay(double multiplier) const {
 	if (multiplier < 0.0)
 		throw std::invalid_argument("Ray: multiplier must be positive");
 

@@ -17,9 +17,9 @@ public:
 	Ratio(unsigned int num, unsigned int den);
 	virtual ~Ratio();
 
-	unsigned int getNumerator();
-	unsigned int getDenominator();
-	double getDouble();
+	unsigned int getNumerator() const;
+	unsigned int getDenominator() const;
+	double getDouble() const;
 };
 
 #endif /* RATIO_H_ */

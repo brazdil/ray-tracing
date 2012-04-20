@@ -31,6 +31,9 @@ void Screen::init() {
 	mVertical = -2.0 * upwards;
 }
 
+Screen::~Screen() {
+}
+
 Vector3d Screen::getTopLeftCorner() const {
     return mTopLeftCorner;
 }
@@ -55,6 +58,22 @@ pCamera Screen::getCamera() const {
 	return mCamera;
 }
 
-Screen::~Screen() {
+Color Screen::getBackgroundColor() const {
+	return mBackgroundColor;
+}
+
+unsigned int Screen::getImageHeight(unsigned int image_width) const {
+	return image_width * mAspectRatio.getDenominator() / mAspectRatio.getNumerator();
+}
+
+Ray Screen::getRay(unsigned int image_width, unsigned int x, unsigned int y) const {
+	return getRay( double(x) / double(image_width), double(y) / double(getImageHeight(image_width)));
+}
+
+Ray Screen::getRay(double x, double y) const {
+	Vector3d point_on_screen = (mTopLeftCorner + (x * mHorizontal) + (y * mVertical));
+	Vector3d direction = point_on_screen - mCamera->getPosition();
+	direction.normalize();
+	return Ray(mCamera->getPosition(), direction);
 }
 

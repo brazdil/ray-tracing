@@ -19,7 +19,7 @@
 
 #include "IObject.h"
 #include "Sphere.h"
-#include "Composite.h"
+#include "Union.h"
 
 using namespace tinyxml2;
 using namespace Eigen;
@@ -43,7 +43,7 @@ public:
 	static pScreen parseScreen(XMLElement* xml_root, pCamera camera);
 
 	static pIObject parseObjects(XMLElement* xml_root);
-	static pIObject parseComposite(XMLElement* xml_root);
+	static pIObject parseUnion(XMLElement* xml_root);
 	static pIObject parseSphere(XMLElement* xml);
 };
 

@@ -6,29 +6,30 @@
  */
 
 #include "IObject.h"
-
+#include <iostream>
 IObject::~IObject() {
 
 }
 
-Vector3d IObject::getFirstIntersection(Ray& ray) {
+pair<const IObject*, double> IObject::getFirstIntersection(const Ray& ray) const {
 	if (!bounding_box().intersects(ray))
 		throw no_intersection_exception();
 
-	vector<double> intersections = ray_intersections(ray);
+	vector< pair<const IObject*, double> > intersections = ray_intersections(ray);
 	if (intersections.empty())
 		throw no_intersection_exception();
 
-	double minimum = numeric_limits<double>::infinity();
-	for (vector<double>::iterator it = intersections.begin(); it < intersections.end(); it++) {
-		if ((*it) < minimum)
+	pair<const IObject*, double> minimum = pair<const IObject*, double>(NULL, numeric_limits<double>::infinity());
+	for (vector< pair<const IObject*, double> >::iterator it = intersections.begin(); it < intersections.end(); it++) {
+		if ((*it).second < minimum.second) {
 			minimum = (*it);
+		}
 	}
 
-	return ray.getPointOnRay(minimum);
+	return minimum;
 }
 
-Color IObject::getColorAtIntersection(Ray& ray) {
-	Vector3d intersection = getFirstIntersection(ray);
+Color IObject::getColorAtIntersection(const Ray& ray) const {
+	pair<const IObject*, double> intersection = getFirstIntersection(ray); // might throw no_intersection exception, let propagate
 	return Color((unsigned char) 012, (unsigned char) 123, (unsigned char) 234);
 }

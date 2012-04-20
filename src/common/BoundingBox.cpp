@@ -24,7 +24,7 @@ BoundingBox::BoundingBox(double xmin, double xmax, double ymin, double ymax, dou
 BoundingBox::~BoundingBox() {
 }
 
-BoundingBox BoundingBox::merge(BoundingBox& another) {
+BoundingBox BoundingBox::merge(const BoundingBox& another) const {
 	return BoundingBox(
 				(this->mXMin < another.mXMin) ? this->mXMin : another.mXMin,
 				(this->mXMax > another.mXMax) ? this->mXMax : another.mXMax,
@@ -34,7 +34,7 @@ BoundingBox BoundingBox::merge(BoundingBox& another) {
 				(this->mZMax > another.mZMax) ? this->mZMax : another.mZMax);
 }
 
-bool BoundingBox::intersects(Ray& ray) {
+bool BoundingBox::intersects(const Ray& ray) const {
 	switch (ray.getClassification())
 	{
 	case Ray::MMM:

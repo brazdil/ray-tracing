@@ -13,22 +13,35 @@
 #include "Color.h"
 
 #include <vector>
+#include <utility>
 #include <stdexcept>
 #include <boost/shared_ptr.hpp>
 
 using namespace std;
 
+class IObject;
+typedef boost::shared_ptr<const IObject> pIObject;
+
 class IObject {
 
-	friend class Composite;
+	friend class Union;
 
 	/*
-	 * Returns list of all intersections between the object and a ray.
-	 * Each intersection is represented by the scalar multiplier of ray's direction vector.
+	 * Return list of all intersections between the object and a ray.
+	 * Each intersection is represented by the scalar multiplier of ray's direction vector, and the ELEMENTARY object it hit.
 	 * Should only return positive intersections!
 	 */
-	virtual vector<double> ray_intersections(Ray& ray) = 0;
-	virtual BoundingBox& bounding_box() = 0;
+	virtual vector< pair<const IObject*, double> > ray_intersections(const Ray& ray) const = 0;
+
+	/*
+	 * Return axis-aligned bounding box of the object
+	 */
+	virtual const BoundingBox& bounding_box() const = 0;
+
+	/*
+	 * Return normal (unit) at given point (assumes its on the surface)
+	 */
+	virtual Vector3d normal(const Vector3d& point_on_surface) const = 0;
 
 public:
 
@@ -37,10 +50,12 @@ public:
 	class no_intersection_exception : public std::exception {
 	};
 
-	Vector3d getFirstIntersection(Ray& ray);
-	Color getColorAtIntersection(Ray& ray);
-};
+	/*
+	 * Returns first incident elementary object and the point of intersection
+	 */
+	pair<const IObject*, double> getFirstIntersection(const Ray& ray) const;
 
-typedef boost::shared_ptr<IObject> pIObject;
+	Color getColorAtIntersection(const Ray& ray) const;
+};
 
 #endif /* IOBJECT_H_ */

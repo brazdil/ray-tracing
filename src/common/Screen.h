@@ -19,6 +19,7 @@ using namespace boost;
 #include "Screen.h"
 #include "Ratio.h"
 #include "Color.h"
+#include "Ray.h"
 
 /*
  * CScreen represents the screen rectangle. It contains the position of the top-left corner of the screen
@@ -51,6 +52,11 @@ public:
     Vector3d getVertical() const;
     Ratio getAspectRatio() const;
     double getDistance() const;
+    Color getBackgroundColor() const;
+    unsigned int getImageHeight(unsigned int image_width) const;
+
+    Ray getRay(unsigned int image_width, unsigned int x, unsigned int y) const;
+    Ray getRay(double x, double y) const;
 };
 
 typedef shared_ptr<Screen> pScreen;

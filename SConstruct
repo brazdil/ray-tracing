@@ -33,7 +33,7 @@ if not conf.CheckPKG('eigen3 >= 3.0.5'):
 
 # Build
 
-compile_append = '  '
+compile_append = ' -g '
 
 # boost_dir = ARGUMENTS.get('boost-dir', '')
 # if boost_dir:

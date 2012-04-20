@@ -1,30 +1,33 @@
 /*
- * Sphere.h
+ * Union.h
  *
  *  Created on: Mar 26, 2012
  *      Author: db538
  */
 
-#ifndef SPHERE_H_
-#define SPHERE_H_
+#ifndef UNION_H_
+#define UNION_H_
 
 #include "IObject.h"
+#include <vector>
 
-class Sphere: public IObject {
+using namespace std;
+
+class Union: public IObject {
 private:
 
-	Vector3d mCenter;
-	double mRadius;
-	bool mNormalOutside;
-	const BoundingBox mBoundingBox;
+	vector<pIObject> mObjects;
+	BoundingBox mBoundingBox;
 
 	virtual vector< pair<const IObject*, double> > ray_intersections(const Ray& ray) const;
 	virtual const BoundingBox& bounding_box() const;
 	virtual Vector3d normal(const Vector3d& point_on_surface) const;
 
 public:
-	Sphere(Vector3d center, double radius);
-	virtual ~Sphere();
+
+	Union(vector<pIObject> objects);
+	virtual ~Union();
+
 };
 
-#endif /* SPHERE_H_ */
+#endif /* UNION_H_ */

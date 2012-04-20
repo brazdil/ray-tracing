@@ -19,25 +19,25 @@ public:
 	Ray(const Vector3d& origin, const Vector3d& direction);
 	virtual ~Ray();
 
-	const Vector3d& getOrigin();
-	const Vector3d& getDirection();
-	Classification getClassification();
-	Vector3d getPointOnRay(double multiplier);
+	const Vector3d& getOrigin() const;
+	const Vector3d& getDirection() const;
+	Classification getClassification() const;
+	Vector3d getPointOnRay(double multiplier) const;
 
 	// origin
-	double x();
-	double y();
-	double z();
+	double x() const;
+	double y() const;
+	double z() const;
 
 	// direction
-	double i();
-	double j();
-	double k();
+	double i() const;
+	double j() const;
+	double k() const;
 
 	// Plücker coordinates
-	double R0();
-	double R1();
-	double R3();
+	double R0() const;
+	double R1() const;
+	double R3() const;
 
 private:
 
