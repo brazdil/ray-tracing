@@ -24,7 +24,7 @@ typedef boost::shared_ptr<IObject> pIObject;
 
 class IObject {
 
-	friend class Union;
+	friend class Composite;
 
 	/*
 	 * Return list of all intersections between the object and a ray.

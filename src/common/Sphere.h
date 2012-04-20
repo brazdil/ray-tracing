@@ -23,7 +23,7 @@ private:
 	virtual Vector3d normal(const Vector3d& point_on_surface) const;
 
 public:
-	Sphere(Vector3d center, double radius);
+	Sphere();
 	virtual ~Sphere();
 };
 

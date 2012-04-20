@@ -12,90 +12,143 @@
 
 using namespace boost;
 
-XMLElement* XML::getPropertyElement(XMLElement* elem, const char* property, const char* type) {
-	XMLElement* subelem = elem->FirstChildElement(property);
+std::string XML::getProperty(XMLElement* elem, std::string property, std::string type) {
+	XMLElement* subelem = elem->FirstChildElement(property.c_str());
 	if (!subelem)
-		throw std::invalid_argument(str(format("XML parse expected \"%s\"") % property));
-	XMLElement* subelem_type = subelem->FirstChildElement(type);
+		throw std::invalid_argument(str(format("XML parse expected property \"%s\"") % property));
+	return getParameter(subelem, type);
+}
+
+std::string XML::getParameter(XMLElement *elem, std::string type) {
+	XMLAttribute* subelem_type = elem->FindAttribute(type.c_str());
 	if (!subelem_type)
-		throw std::invalid_argument(str(format("XML parse expected \"%s.%s\"") % property % type));
-	return subelem_type;
-
+		throw std::invalid_argument(str(format("XML parse expected type \"%s\"") % type));
+	return std::string(subelem_type->Value());
 }
 
-double XML::parseUnsignedIntegerAttribute(XMLElement* elem, const char* name) {
-	const XMLAttribute* attr = elem->FindAttribute(name);
-	if (!attr)
-		throw std::invalid_argument(str(format("Could not find attribute \"%s\"") % name));
-	unsigned int res;
-	if (attr->QueryUnsignedValue(&res) != XML_NO_ERROR)
-		throw std::invalid_argument(str(format("Attribute \"%s\" is not of type unsigned int") % name));
-	return res;
+double XML::parseDouble(XMLElement* xml, std::string property) {
+	return parseDouble(getProperty(xml, property, "double"));
 }
 
-double XML::parseDoubleAttribute(XMLElement* elem, const char* name) {
-	const XMLAttribute* attr = elem->FindAttribute(name);
-	if (!attr)
-		throw std::invalid_argument(str(format("Could not find attribute \"%s\"") % name));
-	double res;
-	if (attr->QueryDoubleValue(&res) != XML_NO_ERROR)
-		throw std::invalid_argument(str(format("Attribute \"%s\" is not of type double") % name));
-	return res;
+double XML::parseDouble(XMLElement* xml) {
+	return parseDouble(getParameter(xml, "double"));
 }
 
-double XML::parseDouble(XMLElement* xml, const char* name) {
-	return	parseDoubleAttribute(
-				getPropertyElement(xml, name, "double"),
-				"value");
+double XML::parseDouble(std::string value) {
+	std::istringstream stream(value);
+
+	double val;
+	stream >> val;
+	std::cout << "double: " << val << std::endl;
+
+	return val;
 }
 
-double XML::parseAngle(XMLElement* xml, const char* name) {
-	XMLElement* elem = getPropertyElement(xml, name, "angle");
-
-	// Get the type
-	bool units_degree;
-	const XMLAttribute* attr_units = elem->FindAttribute("units");
-	if (!attr_units)
-		throw std::invalid_argument("Attribute \"units\" is not specified");
-	if (XMLUtil::StringEqual(attr_units->Value(), "deg"))
-		units_degree = true;
-	else if (XMLUtil::StringEqual(attr_units->Value(), "rad"))
-		units_degree = false;
-	else
-		throw std::invalid_argument("Attribute \"units\" has to be set to either \"deg\" or \"rad\"");
-
-	// Get the value
-	double res = parseDoubleAttribute(elem, "value");
-	if (units_degree)
-		res = M_PI * res / 180.0;
-	return res;
+double XML::parseAngle(XMLElement* xml, std::string property) {
+	return parseAngle(getProperty(xml, property, "angle"));
 }
 
-Vector3d XML::parseVector3d(XMLElement* xml, const char* name) {
-	XMLElement* elem = getPropertyElement(xml, name, "vector3");
+double XML::parseAngle(XMLElement* xml) {
+	return parseAngle(getParameter(xml, "angle"));
+}
+
+double XML::parseAngle(std::string value) {
+	std::istringstream stream(value);
+
+	double val;
+	std::string unit;
+	stream >> val >> unit;
+
+	if (unit == "deg") {
+		std::cout << "angle-deg: " << val << std::endl;
+		val *= M_PI / 180.0;
+	} else if (unit != "rad")
+		throw std::invalid_argument("Angle property \"%s\" must have units either \"deg\" or \"rad\"");
+
+	std::cout << "angle: " << val << std::endl;
+	return val;
+}
+
+Vector3d XML::parseVector3d(XMLElement* xml, std::string property) {
+	return parseVector3d(getProperty(xml, property, "vector3"));
+}
+
+Vector3d XML::parseVector3d(XMLElement* xml) {
+	return parseVector3d(getParameter(xml, "vector3"));
+}
+
+Vector3d XML::parseVector3d(std::string value) {
+	std::istringstream stream(value);
+
+	double x, y, z;
+	stream >> x >> y >> z;
 
 	Vector3d res;
-	res << 	parseDoubleAttribute(elem, "x"),
-			parseDoubleAttribute(elem, "y"),
-			parseDoubleAttribute(elem, "z");
+	res << 	x, y, z;
+	std::cout << "vector3: " << res.data()[0] << ", " << res.data()[1] << ", " << res.data()[2] << std::endl;
 	return res;
 }
 
-Ratio XML::parseRatio(XMLElement* xml, const char* name) {
-	XMLElement* elem = getPropertyElement(xml, name, "ratio");
-
-	return	Ratio(
-				parseUnsignedIntegerAttribute(elem, "numerator"),
-				parseUnsignedIntegerAttribute(elem, "denominator"));
+Ratio XML::parseRatio(XMLElement* xml, std::string property) {
+	return parseRatio(getProperty(xml, property, "ratio"));
 }
 
-Color XML::parseColor(XMLElement* xml, const char* name) {
-	XMLElement* elem = getPropertyElement(xml, name, "color");
+Ratio XML::parseRatio(XMLElement* xml) {
+	return parseRatio(getParameter(xml, "ratio"));
+}
 
-	return 	Color(
-				(float) parseUnsignedIntegerAttribute(elem, "r") / 255.0f,
-				(float) parseUnsignedIntegerAttribute(elem, "g") / 255.0f,
-				(float) parseUnsignedIntegerAttribute(elem, "b") / 255.0f);
+Ratio XML::parseRatio(std::string value) {
+	std::istringstream stream(value);
+
+	unsigned int numerator, denominator;
+	stream >> numerator >> denominator;
+	std::cout << "ratio: " << numerator << "/" << denominator << std::endl;
+
+	return	Ratio(numerator, denominator);
+}
+
+unsigned char XML::getHex(char hex) {
+	switch (hex) {
+	case '0': return 0;
+	case '1': return 1;
+	case '2': return 2;
+	case '3': return 3;
+	case '4': return 4;
+	case '5': return 5;
+	case '6': return 6;
+	case '7': return 7;
+	case '8': return 8;
+	case '9': return 9;
+	case 'A': return 10;
+	case 'B': return 11;
+	case 'C': return 12;
+	case 'D': return 13;
+	case 'E': return 14;
+	case 'F': return 15;
+	default: throw std::invalid_argument("Color property \"%s\" must be in 6-digit HEX");
+	}
+}
+
+Color XML::parseColor(XMLElement* xml, std::string property) {
+	return parseColor(getProperty(xml, property, "color"));
+}
+
+Color XML::parseColor(XMLElement* xml) {
+	return parseColor(getParameter(xml, "color"));
+}
+
+Color XML::parseColor(std::string value) {
+	if (value.length() != 6)
+		throw std::invalid_argument("Property \"%s\" must be in 6-digit HEX");
+
+	unsigned char r, g, b;
+	r = (getHex(value[0]) << 4) + getHex(value[1]);
+	g = (getHex(value[2]) << 4) + getHex(value[3]);
+	b = (getHex(value[4]) << 4) + getHex(value[5]);
+
+	std::cout << "color: " << (int) r << ", " << (int) g << ", " << (int) b << std::endl;
+
+	return Color(r, g, b);
 }
 
 pCamera XML::parseCamera(XMLElement* xml_root) {
@@ -120,7 +173,7 @@ pScreen XML::parseScreen(XMLElement* xml_root, pCamera camera) {
 					camera,
 					parseDouble(xml_elem_screen, "distance"),
 					parseRatio(xml_elem_screen, "aspect-ratio"),
-					parseColor(xml_elem_screen, "background-color")));
+					parseColor(xml_elem_screen, "background")));
 }
 
 pIObject XML::parseObjects(XMLElement* xml_root) {
@@ -128,33 +181,53 @@ pIObject XML::parseObjects(XMLElement* xml_root) {
 	if (!xml_elem_objects)
 		throw std::runtime_error("Scene description doesn't contain objects information");
 
-	XMLElement* xml_elem_composite = xml_elem_objects->FirstChildElement("union");
-	if (!xml_elem_composite)
-		throw std::runtime_error("Objects part of XML needs to contain a union first");
-
-	return parseUnion(xml_elem_composite);
+	return parseObjectOrOperation(xml_elem_objects->FirstChildElement());
 }
 
-pIObject XML::parseUnion(XMLElement* xml_elem_composite) {
+pIObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
+	if (!xml_elem)
+		throw std::invalid_argument("Expected object/operation");
+
+	std::string name(xml_elem->Name());
+
+	if (name == "composite")
+		return parseObject_Composite(xml_elem);
+	else if (name == "sphere")
+		return parseObject_Sphere(xml_elem);
+	else if (name == "translate")
+		return parseOperation_Translate(xml_elem);
+	else if (name == "scale")
+		return parseOperation_Scale(xml_elem);
+	else
+		throw std::invalid_argument(boost::str(boost::format("Invalid object/operation type \"%s\"") % name));
+}
+
+pIObject XML::parseObject_Composite(XMLElement* xml_elem_composite) {
 	vector<pIObject> sub_objects;
 
 	XMLElement* xml_sub_elem = xml_elem_composite->FirstChildElement();
 	while (xml_sub_elem) {
-
-		if (XMLUtil::StringEqual(xml_sub_elem->Name(), "union"))
-			sub_objects.push_back(parseUnion(xml_sub_elem));
-		else if (XMLUtil::StringEqual(xml_sub_elem->Name(), "sphere"))
-			sub_objects.push_back(parseSphere(xml_sub_elem));
-
+		sub_objects.push_back(parseObjectOrOperation(xml_sub_elem));
 		xml_sub_elem = xml_sub_elem->NextSiblingElement();
 	}
 
-	return pIObject(new Union(sub_objects));
+	return pIObject(new Composite(sub_objects));
 }
 
-pIObject XML::parseSphere(XMLElement* xml_elem_sphere) {
-	return pIObject(
-				new Sphere(
-					parseVector3d(xml_elem_sphere, "center"),
-					parseDouble(xml_elem_sphere, "radius")));
+pIObject XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
+	return pIObject(new Sphere());
+}
+
+pIObject XML::parseOperation_Translate(XMLElement *xml_elem) {
+	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	Vector3d delta(parseVector3d(xml_elem));
+	// TODO: apply matrix
+	return obj;
+}
+
+pIObject XML::parseOperation_Scale(XMLElement *xml_elem) {
+	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	double factor(parseDouble(xml_elem));
+	// TODO: apply matrix
+	return obj;
 }

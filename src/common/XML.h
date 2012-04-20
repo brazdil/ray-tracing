@@ -19,32 +19,48 @@
 
 #include "IObject.h"
 #include "Sphere.h"
-#include "Union.h"
+#include "Composite.h"
 
 using namespace tinyxml2;
 using namespace Eigen;
 
 class XML {
 private:
-	static XMLElement* getPropertyElement(XMLElement* elem, const char* property, const char* type);
-	static double parseUnsignedIntegerAttribute(XMLElement* elem, const char* name);
-	static double parseDoubleAttribute(XMLElement* elem, const char* name);
+	static std::string getProperty(XMLElement* elem, std::string property, std::string type);
+	static std::string getParameter(XMLElement *elem, std::string type);
+	static unsigned char getHex(char hex);
 
 public:
 
-	static double parseDouble(XMLElement* xml, const char* name);
-	static double parseAngle(XMLElement* xml, const char* name);
-	static Vector3d parseVector3d(XMLElement* xml, const char* name);
+	static double parseDouble(XMLElement* xml, std::string property);
+	static double parseDouble(XMLElement* xml);
+	static double parseDouble(std::string value);
 
-	static Ratio parseRatio(XMLElement* xml, const char* name);
-	static Color parseColor(XMLElement* xml, const char* name);
+	static double parseAngle(XMLElement* xml, std::string property);
+	static double parseAngle(XMLElement* xml);
+	static double parseAngle(std::string value);
+
+	static Vector3d parseVector3d(XMLElement* xml, std::string name);
+	static Vector3d parseVector3d(XMLElement* xml);
+	static Vector3d parseVector3d(std::string value);
+
+	static Ratio parseRatio(XMLElement* xml, std::string property);
+	static Ratio parseRatio(XMLElement* xml);
+	static Ratio parseRatio(std::string value);
+
+	static Color parseColor(XMLElement* xml, std::string property);
+	static Color parseColor(XMLElement* xml);
+	static Color parseColor(std::string value);
 
 	static pCamera parseCamera(XMLElement* xml_root);
 	static pScreen parseScreen(XMLElement* xml_root, pCamera camera);
-
 	static pIObject parseObjects(XMLElement* xml_root);
-	static pIObject parseUnion(XMLElement* xml_root);
-	static pIObject parseSphere(XMLElement* xml);
+
+	static pIObject parseObjectOrOperation(XMLElement* xml);
+	static pIObject parseObject_Composite(XMLElement* xml);
+	static pIObject parseObject_Sphere(XMLElement* xml);
+	static pIObject parseOperation_Translate(XMLElement* xml);
+	static pIObject parseOperation_Scale(XMLElement* xml);
 };
 
 #endif /* XML_H_ */

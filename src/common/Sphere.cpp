@@ -10,17 +10,15 @@
 
 using namespace tinyxml2;
 
-Sphere::Sphere(Vector3d center, double radius)
-	: mCenter(center), mRadius(radius), mNormalOutside(true),
+Sphere::Sphere()
+	: mCenter(0.0, 0.0, 0.0), mRadius(1.0), mNormalOutside(true),
 	  mBoundingBox (BoundingBox(
-						mCenter.data()[0] - mRadius,
-						mCenter.data()[0] + mRadius,
-						mCenter.data()[1] - mRadius,
-						mCenter.data()[1] + mRadius,
-						mCenter.data()[2] - mRadius,
-						mCenter.data()[2] + mRadius)) {
-	if (mRadius < 0.0)
-		throw std::invalid_argument("Sphere radius has to be positive");
+			  	  	  mCenter.data()[0] - mRadius,
+			  	  	  mCenter.data()[0] + mRadius,
+			  	  	  mCenter.data()[1] - mRadius,
+			  	  	  mCenter.data()[1] + mRadius,
+			  	  	  mCenter.data()[2] - mRadius,
+			  	  	  mCenter.data()[2] + mRadius)) {
 }
 
 Sphere::~Sphere() {
