@@ -20,7 +20,7 @@
 using namespace std;
 
 class IObject;
-typedef boost::shared_ptr<const IObject> pIObject;
+typedef boost::shared_ptr<IObject> pIObject;
 
 class IObject {
 
