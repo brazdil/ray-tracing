@@ -24,6 +24,13 @@ public:
 
 	BoundingBox merge(const BoundingBox& another) const;
 	bool intersects(const Ray& ray) const;
+
+//	double getXMin() const;
+//	double getXMax() const;
+//	double getYMin() const;
+//	double getYMax() const;
+//	double getZMin() const;
+//	double getZMax() const;
 };
 
 #endif /* BOUNDINGBOX_H_ */

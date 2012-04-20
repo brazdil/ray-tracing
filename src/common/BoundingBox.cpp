@@ -152,3 +152,27 @@ bool BoundingBox::intersects(const Ray& ray) const {
 
 	return false;
 }
+
+//double BoundingBox::getXMin() const {
+//	return mXMin;
+//}
+//
+//double BoundingBox::getXMax() const {
+//	return mXMax;
+//}
+//
+//double BoundingBox::getYMin() const {
+//	return mYMin;
+//}
+//
+//double BoundingBox::getYMax() const {
+//	return mYMax;
+//}
+//
+//double BoundingBox::getZMin() const {
+//	return mZMin;
+//}
+//
+//double BoundingBox::getZMax() const {
+//	return mZMax;
+//}

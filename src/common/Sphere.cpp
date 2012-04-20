@@ -75,5 +75,7 @@ pIObject Sphere::translate(const Vector3d& delta) const {
 }
 
 pIObject Sphere::scale(double factor) const {
-	return pIObject(new Sphere(mCenter, mRadius * factor, mNormalOutside));
+	return pIObject(new Sphere(mCenter * factor, mRadius * factor, mNormalOutside));
 }
+
+// rotate center (and top point)
