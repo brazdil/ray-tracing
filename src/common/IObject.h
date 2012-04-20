@@ -56,6 +56,16 @@ public:
 	pair<const IObject*, double> getFirstIntersection(const Ray& ray) const;
 
 	Color getColorAtIntersection(const Ray& ray) const;
+
+	/*
+	 * Translate
+	 */
+	virtual pIObject translate(const Vector3d& delta) const = 0;
+
+	/*
+	 * Scale
+	 */
+	virtual pIObject scale(double factor) const = 0;
 };
 
 #endif /* IOBJECT_H_ */

@@ -188,30 +188,32 @@ pIObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
 	if (!xml_elem)
 		throw std::invalid_argument("Expected object/operation");
 
-	std::string name(xml_elem->Name());
-
-	if (name == "composite")
-		return parseObject_Composite(xml_elem);
-	else if (name == "sphere")
-		return parseObject_Sphere(xml_elem);
-	else if (name == "translate")
-		return parseOperation_Translate(xml_elem);
-	else if (name == "scale")
-		return parseOperation_Scale(xml_elem);
-	else
-		throw std::invalid_argument(boost::str(boost::format("Invalid object/operation type \"%s\"") % name));
-}
-
-pIObject XML::parseObject_Composite(XMLElement* xml_elem_composite) {
 	vector<pIObject> sub_objects;
 
-	XMLElement* xml_sub_elem = xml_elem_composite->FirstChildElement();
-	while (xml_sub_elem) {
-		sub_objects.push_back(parseObjectOrOperation(xml_sub_elem));
-		xml_sub_elem = xml_sub_elem->NextSiblingElement();
+	while (xml_elem) {
+		std::string name(xml_elem->Name());
+
+		std::cout << name << std::endl;
+
+		if (name == "sphere")
+			sub_objects.push_back(parseObject_Sphere(xml_elem));
+		else if (name == "translate")
+			sub_objects.push_back(parseOperation_Translate(xml_elem));
+		else if (name == "scale")
+			sub_objects.push_back(parseOperation_Scale(xml_elem));
+		else
+			throw std::invalid_argument(boost::str(boost::format("Invalid object/operation type \"%s\"") % name));
+
+		xml_elem = xml_elem->NextSiblingElement();
 	}
 
-	return pIObject(new Composite(sub_objects));
+	if (sub_objects.size() < 1)
+		throw std::invalid_argument("Expected at least one sub-object/operation");
+	else if (sub_objects.size() == 1)
+		return sub_objects[0];
+	else
+		return pIObject(new Composite(sub_objects));
+
 }
 
 pIObject XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
@@ -219,15 +221,15 @@ pIObject XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
 }
 
 pIObject XML::parseOperation_Translate(XMLElement *xml_elem) {
-	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
 	Vector3d delta(parseVector3d(xml_elem));
-	// TODO: apply matrix
+	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	obj->translate(delta);
 	return obj;
 }
 
 pIObject XML::parseOperation_Scale(XMLElement *xml_elem) {
-	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
 	double factor(parseDouble(xml_elem));
-	// TODO: apply matrix
+	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	obj->scale(factor);
 	return obj;
 }

@@ -28,6 +28,8 @@ public:
 	Composite(vector<pIObject> objects);
 	virtual ~Composite();
 
+	virtual pIObject translate(const Vector3d& delta) const;
+	virtual pIObject scale(double factor) const;
 };
 
 #endif /* COMPOSITE_H_ */

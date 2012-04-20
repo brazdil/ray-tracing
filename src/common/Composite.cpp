@@ -53,3 +53,24 @@ const BoundingBox& Composite::bounding_box() const {
 Vector3d Composite::normal(const Vector3d& point_on_surface) const {
 	throw std::runtime_error("Union doesn't have a normal");
 }
+
+pIObject Composite::translate(const Vector3d& delta) const {
+	vector<pIObject> new_sub_objects;
+	new_sub_objects.reserve(mObjects.size());
+
+	for (vector<pIObject>::const_iterator it = mObjects.begin(); it < mObjects.end(); it++)
+		new_sub_objects.push_back((*it)->translate(delta));
+
+	return pIObject(new Composite(new_sub_objects));
+}
+
+pIObject Composite::scale(double factor) const {
+	vector<pIObject> new_sub_objects;
+	new_sub_objects.reserve(mObjects.size());
+
+	for (vector<pIObject>::const_iterator it = mObjects.begin(); it < mObjects.end(); it++)
+		new_sub_objects.push_back((*it)->scale(factor));
+
+	return pIObject(new Composite(new_sub_objects));
+}
+

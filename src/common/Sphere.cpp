@@ -11,17 +11,31 @@
 using namespace tinyxml2;
 
 Sphere::Sphere()
-	: mCenter(0.0, 0.0, 0.0), mRadius(1.0), mNormalOutside(true),
-	  mBoundingBox (BoundingBox(
-			  	  	  mCenter.data()[0] - mRadius,
-			  	  	  mCenter.data()[0] + mRadius,
-			  	  	  mCenter.data()[1] - mRadius,
-			  	  	  mCenter.data()[1] + mRadius,
-			  	  	  mCenter.data()[2] - mRadius,
-			  	  	  mCenter.data()[2] + mRadius)) {
+	: mCenter(0.0, 0.0, 0.0), mRadius(1.0), mNormalOutside(true) {
+	init();
+}
+
+Sphere::Sphere(Vector3d center, double radius, bool normal_outside)
+	: mCenter(center), mRadius(radius), mNormalOutside(normal_outside) {
+	init();
 }
 
 Sphere::~Sphere() {
+}
+
+void Sphere::init() {
+	if (mRadius < 0) {
+		// flip inside out
+		mRadius = -mRadius;
+		mNormalOutside = !mNormalOutside;
+	}
+
+	mBoundingBox = BoundingBox(mCenter.data()[0] - mRadius,
+				  	  	       mCenter.data()[0] + mRadius,
+				  	  	       mCenter.data()[1] - mRadius,
+				  	  	       mCenter.data()[1] + mRadius,
+				  	  	       mCenter.data()[2] - mRadius,
+				  	  	       mCenter.data()[2] + mRadius);
 }
 
 vector< pair<const IObject*, double> > Sphere::ray_intersections(const Ray& ray) const {
@@ -54,4 +68,12 @@ Vector3d Sphere::normal(const Vector3d& point_on_surface) const {
 	Vector3d unit_normal = point_on_surface - mCenter;
 	unit_normal.normalize();
 	return unit_normal;
+}
+
+pIObject Sphere::translate(const Vector3d& delta) const {
+	return pIObject(new Sphere(mCenter + delta, mRadius, mNormalOutside));
+}
+
+pIObject Sphere::scale(double factor) const {
+	return pIObject(new Sphere(mCenter, mRadius * factor, mNormalOutside));
 }

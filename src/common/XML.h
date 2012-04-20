@@ -57,7 +57,6 @@ public:
 	static pIObject parseObjects(XMLElement* xml_root);
 
 	static pIObject parseObjectOrOperation(XMLElement* xml);
-	static pIObject parseObject_Composite(XMLElement* xml);
 	static pIObject parseObject_Sphere(XMLElement* xml);
 	static pIObject parseOperation_Translate(XMLElement* xml);
 	static pIObject parseOperation_Scale(XMLElement* xml);
