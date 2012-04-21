@@ -5,9 +5,10 @@
  *      Author: db538
  */
 
-#include <fstream>
-
 #include "Master.h"
+
+#include <fstream>
+#include <algorithm>
 
 const char Master::mVersion = 1;
 
@@ -322,6 +323,8 @@ void Master::run() {
 		else                       part->col_to = mImageWidth;
 		mTaskList.push_back(part);
 	}
+	// shuffle parts, just for fun
+	random_shuffle(mTaskList.begin(), mTaskList.end());
 
 	// clear the workers list
 	mWorkersList.clear();
