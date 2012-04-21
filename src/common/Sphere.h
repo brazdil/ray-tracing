@@ -30,6 +30,7 @@ public:
 
 	virtual pIObject translate(const Vector3d& delta) const;
 	virtual pIObject scale(double factor) const;
+	virtual std::string print_debug(unsigned int indent) const;
 };
 
 #endif /* SPHERE_H_ */

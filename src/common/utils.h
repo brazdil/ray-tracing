@@ -42,5 +42,10 @@ inline bool isEqual(const Vector3d& v1, const Vector3d& v2) {
 	return isEqual(v1_x, v2_x) && isEqual(v1_y, v2_y) && isEqual(v1_z, v2_z);
 }
 
+inline std::string toString(const Vector3d& v) {
+	std::ostringstream str;
+	str << "[" << v.data()[0] << ", " << v.data()[1] << ", " << v.data()[2] << "]";
+	return str.str();
+}
 
 #endif /* EXTRA_MATH_H_ */

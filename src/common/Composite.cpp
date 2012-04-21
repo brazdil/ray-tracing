@@ -74,3 +74,14 @@ pIObject Composite::scale(double factor) const {
 	return pIObject(new Composite(new_sub_objects));
 }
 
+std::string Composite::print_debug(unsigned int indent) const {
+	std::ostringstream output;
+	for (int i = 0; i < indent; ++i)
+		output << " ";
+
+	output << "Composite: count=" << mObjects.size() << std::endl;
+
+	for (vector<pIObject>::const_iterator it = mObjects.begin(); it < mObjects.end(); it++)
+		output << (*it)->print_debug(indent + 2);
+	return output.str();
+}

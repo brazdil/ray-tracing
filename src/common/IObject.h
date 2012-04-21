@@ -66,6 +66,11 @@ public:
 	 * Scale
 	 */
 	virtual pIObject scale(double factor) const = 0;
+
+	/*
+	 * Print out information about the object
+	 */
+	virtual std::string print_debug(unsigned int indent = 0) const = 0;
 };
 
 #endif /* IOBJECT_H_ */

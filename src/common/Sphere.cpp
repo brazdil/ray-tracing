@@ -79,3 +79,16 @@ pIObject Sphere::scale(double factor) const {
 }
 
 // rotate center (and top point)
+
+std::string Sphere::print_debug(unsigned int indent) const {
+	std::ostringstream output;
+	for (int i = 0; i < indent; ++i)
+		output << " ";
+
+	output << "Sphere: center=" << toString(mCenter)
+		   << " radius=" << mRadius
+		   << " normal_out=" << mNormalOutside
+		   << std::endl;
+
+	return output.str();
+}

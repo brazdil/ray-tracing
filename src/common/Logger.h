@@ -35,8 +35,8 @@ public:
 
 	void setTitle(std::string title);
 
-	void println(boost::basic_format<char> format, MessageImportance level);
-	void println(std::string message, MessageImportance level);
+	void println(boost::basic_format<char> format, MessageImportance level, bool print_endl = true);
+	void println(std::string message, MessageImportance level, bool print_endl = true);
 
 	void enableProgressBar(bool value);
 	void setProgressBarValue(long value);

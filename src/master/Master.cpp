@@ -51,7 +51,14 @@ Master::Master(pLogger logger,
 	} catch (std::exception& e) {
 		throw std::runtime_error("Could not load the input file");
 	}
+
 	Task task(mInputFile);
+
+	if (mLogger->getLevel() >= Logger::DETAILED) {
+		std::ostringstream debug;
+		debug << "Scene structure:" << std::endl << task.getObject()->print_debug(10);
+		mLogger->println(debug.str(), Logger::DETAILED, true);
+	}
 
 	// compute height from scene data
 	mImageHeight = task.getScreen()->getImageHeight(mImageWidth);

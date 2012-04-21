@@ -68,11 +68,11 @@ void Logger::setProgressBarMax(long value) {
 		mProgressBar_Value = mProgressBar_Max;
 }
 
-void Logger::println(boost::basic_format<char> format, MessageImportance level) {
-	println(boost::str(format), level);
+void Logger::println(boost::basic_format<char> format, MessageImportance level, bool print_endl) {
+	println(boost::str(format), level, print_endl);
 }
 
-void Logger::println(std::string message, MessageImportance level) {
+void Logger::println(std::string message, MessageImportance level, bool print_endl) {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	if (level <= mMaxLevel) {
 		clearProgressBar();
@@ -82,7 +82,9 @@ void Logger::println(std::string message, MessageImportance level) {
 			std::cerr << mTitle << ": ";
 		if (level == ERROR)
 			std::cerr << "ERROR - ";
-		std::cerr << message << std::endl << std::flush;
+		std::cerr << message;
+		if (print_endl) std::cerr << std::endl;
+		std::cerr << std::flush;
 		printProgressBar(true);
 	}
 }

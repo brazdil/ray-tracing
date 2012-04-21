@@ -39,7 +39,6 @@ double XML::parseDouble(std::string value) {
 
 	double val;
 	stream >> val;
-	std::cout << "double: " << val << std::endl;
 
 	return val;
 }
@@ -59,13 +58,11 @@ double XML::parseAngle(std::string value) {
 	std::string unit;
 	stream >> val >> unit;
 
-	if (unit == "deg") {
-		std::cout << "angle-deg: " << val << std::endl;
+	if (unit == "deg")
 		val *= M_PI / 180.0;
-	} else if (unit != "rad")
+	else if (unit != "rad")
 		throw std::invalid_argument("Angle property \"%s\" must have units either \"deg\" or \"rad\"");
 
-	std::cout << "angle: " << val << std::endl;
 	return val;
 }
 
@@ -85,7 +82,7 @@ Vector3d XML::parseVector3d(std::string value) {
 
 	Vector3d res;
 	res << 	x, y, z;
-	std::cout << "vector3: " << res.data()[0] << ", " << res.data()[1] << ", " << res.data()[2] << std::endl;
+
 	return res;
 }
 
@@ -102,7 +99,6 @@ Ratio XML::parseRatio(std::string value) {
 
 	unsigned int numerator, denominator;
 	stream >> numerator >> denominator;
-	std::cout << "ratio: " << numerator << "/" << denominator << std::endl;
 
 	return	Ratio(numerator, denominator);
 }
@@ -145,8 +141,6 @@ Color XML::parseColor(std::string value) {
 	r = (getHex(value[0]) << 4) + getHex(value[1]);
 	g = (getHex(value[2]) << 4) + getHex(value[3]);
 	b = (getHex(value[4]) << 4) + getHex(value[5]);
-
-	std::cout << "color: " << (int) r << ", " << (int) g << ", " << (int) b << std::endl;
 
 	return Color(r, g, b);
 }
@@ -193,8 +187,6 @@ pIObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
 	while (xml_elem) {
 		std::string name(xml_elem->Name());
 
-		std::cout << name << std::endl;
-
 		if (name == "sphere")
 			sub_objects.push_back(parseObject_Sphere(xml_elem));
 		else if (name == "translate")
@@ -223,13 +215,11 @@ pIObject XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
 pIObject XML::parseOperation_Translate(XMLElement *xml_elem) {
 	Vector3d delta(parseVector3d(xml_elem));
 	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
-	obj->translate(delta);
-	return obj;
+	return obj->translate(delta);
 }
 
 pIObject XML::parseOperation_Scale(XMLElement *xml_elem) {
 	double factor(parseDouble(xml_elem));
 	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
-	obj->scale(factor);
-	return obj;
+	return obj->scale(factor);
 }
