@@ -20,7 +20,7 @@ int main(int argc, const char** argv) {
 	unsigned int arg_division;
 	string arg_input;
 	string arg_output;
-	unsigned int arg_realtime;
+	unsigned int arg_realtime = 0;
 
 	po::options_description desc;
 	desc.add_options()
@@ -31,7 +31,9 @@ int main(int argc, const char** argv) {
 	    ("work-division", po::value<unsigned int>(&arg_division)->default_value(32), "number of parts the work should be divided in")
 	    ("input-file", po::value<string>(&arg_input), "path to file with scene description")
     	("output-file", po::value<string>(&arg_output), "where to save the produced picture")
+#ifndef NO_REALTIME
     	("realtime", po::value<unsigned int>(&arg_realtime)->default_value(1), "interval of realtime updates in seconds, 0 = off")
+#endif
     ;
 
 	po::positional_options_description pos_opt;

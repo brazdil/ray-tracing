@@ -9,8 +9,16 @@
 #include <iostream>
 
 ResultManager::ResultManager(unsigned int image_width, unsigned int image_height, unsigned int realtime)
-	: mUseSDL(realtime > 0), mWndWidth(800), mWndHeight(600), mWindowUpdateInterval(realtime), mImageWidth(image_width), mImageHeight(image_height) {
+	:
+#ifndef NO_REALTIME
+		mUseSDL(realtime > 0), mWndWidth(800), mWndHeight(600), mWindowUpdateInterval(realtime),
+#else
+		mUseSDL(false),
+#endif
+		mImageWidth(image_width), mImageHeight(image_height) {
+
 	if (mUseSDL) {
+#ifndef NO_REALTIME
 		mWindowThread = shared_ptr<thread>();
 
 		// init SDL
@@ -23,6 +31,7 @@ ResultManager::ResultManager(unsigned int image_width, unsigned int image_height
 	    mResultSDL = SDL_CreateRGBSurface(SDL_SWSURFACE, mImageWidth, mImageHeight, mWndBpp, 0, 0, 0, 0);
 	    if (mResultSDL == NULL)
 			throw std::runtime_error(str(format("Unable to initialize SDL surface with size %dx%d") % mImageWidth % mImageHeight));
+#endif
 	} else {
 		mResultBMP = pBMP(new BMP());
 		mResultBMP->SetBitDepth(24);
@@ -32,6 +41,7 @@ ResultManager::ResultManager(unsigned int image_width, unsigned int image_height
 
 ResultManager::~ResultManager() {
 	if (mUseSDL) {
+#ifndef NO_REALTIME
 		if (mResultSDL)
 			SDL_FreeSurface(mResultSDL);
 		if (mWindowThread) {
@@ -40,8 +50,11 @@ ResultManager::~ResultManager() {
 			mWindowThread->join();
 		}
 		SDL_Quit();
+#endif
 	}
 }
+
+#ifndef NO_REALTIME
 
 inline bool ResultManager::fitsInWindow() {
 	return mImageWidth <= mWndWidth && mImageHeight <= mWndHeight;
@@ -129,10 +142,15 @@ void ResultManager::windowHandler() {
 	}
 }
 
+#endif
+
 void ResultManager::startWindow() {
+#ifndef NO_REALTIME
 	mWindowFinish = false;
 	mWindowThread = shared_ptr<thread>(new thread(bind(&ResultManager::windowHandler, this)));
+#endif
 }
+
 
 void ResultManager::setPixel(unsigned int x, unsigned int y, unsigned char r, unsigned char g, unsigned char b) {
 	mutex::scoped_lock lock(mResultMutex);
@@ -141,6 +159,7 @@ void ResultManager::setPixel(unsigned int x, unsigned int y, unsigned char r, un
 	assert(y < mImageHeight);
 
 	if (mUseSDL) {
+#ifndef NO_REALTIME
 		SDL_LockSurface(mResultSDL);
 		unsigned char *pixels = (unsigned char*) mResultSDL->pixels;
 		unsigned int pixel_offset = (mImageWidth * y + x) * 4;
@@ -149,6 +168,7 @@ void ResultManager::setPixel(unsigned int x, unsigned int y, unsigned char r, un
 		pixels[pixel_offset + 2] = r;
 		pixels[pixel_offset + 3] = 0xFF;
 		SDL_UnlockSurface(mResultSDL);
+#endif
 	} else {
 		RGBApixel color;
 		color.Red = r;
@@ -161,7 +181,9 @@ void ResultManager::setPixel(unsigned int x, unsigned int y, unsigned char r, un
 
 void ResultManager::saveResult(std::string filename) {
 	if (mUseSDL) {
+#ifndef NO_REALTIME
 		SDL_SaveBMP(mResultSDL, filename.c_str());
+#endif
 	} else {
 		mResultBMP->WriteToFile(filename.c_str());
 	}

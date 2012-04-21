@@ -8,9 +8,11 @@
 #ifndef SDLWINDOW_H_
 #define SDLWINDOW_H_
 
-#include "SDL.h"
-#include "../sdl_gfx/SDL_rotozoom.h"
 #include "../easybmp/EasyBMP.h"
+#ifndef NO_REALTIME
+	#include "SDL.h"
+	#include "../sdl_gfx/SDL_rotozoom.h"
+#endif
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -23,11 +25,15 @@ typedef shared_ptr<BMP> pBMP;
 
 class ResultManager {
 private:
+
+#ifndef NO_REALTIME
 	static const unsigned int mWndBpp = 32; // ! if you change this, change the initialization of result surface as well !
 	static const unsigned int mWndFlags = SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF;
+#endif
 
 	const bool mUseSDL;
 
+#ifndef NO_REALTIME
 	unsigned int mWndWidth, mWndHeight;
 	unsigned int mDrawingPosX, mDrawingPosY, mDrawingWidth, mDrawingHeight, mDrawingScale;
 	SDL_Surface *mWindow;
@@ -35,16 +41,21 @@ private:
 	shared_ptr<thread> mWindowThread;
 	unsigned int mWindowUpdateInterval;
 
+	SDL_Surface *mResultSDL;
+#endif
+
 	mutex mResultMutex;
 	const unsigned int mImageWidth, mImageHeight;
-	SDL_Surface *mResultSDL;
 	pBMP mResultBMP;
 
+#ifndef NO_REALTIME
 	inline bool fitsInWindow();
 	inline bool needsToFitHeight();
 
 	void windowResize();
 	void windowHandler();
+#endif
+
 public:
 	ResultManager(unsigned int image_width, unsigned int image_height, unsigned int realtime);
 	virtual ~ResultManager();

@@ -1,5 +1,11 @@
 env = Environment()
 
+arg_sdl = ARGUMENTS.get('sdl', '1')
+if arg_sdl == '0':
+	use_sdl = False
+else:
+	use_sdl = True
+
 # Predefined functions 
 
 def CheckPKGConfig(context, version):
@@ -23,17 +29,20 @@ if not conf.CheckPKGConfig('0.15.0'):
 	print 'pkg-config >= 0.15.0 not found.'
 	Exit(1)
 
-if not conf.CheckPKG('sdl >= 1.2.14'):
-	print 'libsdl >= 1.2.14 not found.'
-	Exit(1)
-
 if not conf.CheckPKG('eigen3 >= 3.0.5'):
 	print 'eigen3 >= 3.0.5 not found.'
 	Exit(1)
 
+if use_sdl:
+	if not conf.CheckPKG('sdl >= 1.2.14'):
+		print 'libsdl >= 1.2.14 not found.'
+		Exit(1)
+
 # Build
 
 compile_append = ' -g '
+if not use_sdl:
+	compile_append = compile_append + " -DNO_REALTIME "
 
 # boost_dir = ARGUMENTS.get('boost-dir', '')
 # if boost_dir:
@@ -47,23 +56,29 @@ source_slave = Glob('src/slave/*.cpp')
 source_easybmp = Glob('src/easybmp/*.cpp')
 source_sdl_gfx = Glob('src/sdl_gfx/*.c')
 
-includes_sdl = ' `pkg-config --cflags sdl` '
-includes_sdl_gfx = includes_sdl;
 includes_common = compile_append;
-includes_master = compile_append + includes_sdl
 includes_slave = compile_append;
+if use_sdl:
+	includes_sdl = ' `pkg-config --cflags sdl` '
+	includes_sdl_gfx = includes_sdl;
+	includes_master = compile_append + includes_sdl
+else:
+	includes_master = compile_append
 
 name_lib_common = 'raytracing-shared'
 name_lib_easybmp = 'easybmp'
 name_lib_sdl_gfx = 'sdl_gfx'
 
 libs_common = [name_lib_common, 'archive', 'boost_system', 'boost_thread', 'boost_program_options'];
-libs_master = libs_common + ['SDL', name_lib_easybmp, name_lib_sdl_gfx]
 libs_slave = libs_common
+libs_master = libs_common + [name_lib_easybmp]
+if use_sdl:
+	libs_master = libs_master + ['SDL', name_lib_sdl_gfx]
 
 env.StaticLibrary(name_lib_easybmp, source_easybmp)
-env.StaticLibrary(name_lib_sdl_gfx, source_sdl_gfx, CCFLAGS = includes_sdl_gfx)
 env.StaticLibrary(name_lib_common, source_common, CCFLAGS = includes_common)
+if use_sdl:
+	env.StaticLibrary(name_lib_sdl_gfx, source_sdl_gfx, CCFLAGS = includes_sdl_gfx)
 
 program_slave = env.Program('slave', source_slave, LIBS = libs_slave, CCFLAGS = includes_slave, LIBPATH = '.')
 program_master = env.Program('master', source_master, LIBS = libs_master, CCFLAGS = includes_master, LIBPATH = '.')
