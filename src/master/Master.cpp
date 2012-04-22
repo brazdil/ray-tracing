@@ -57,7 +57,7 @@ Master::Master(pLogger logger,
 
 	if (mLogger->getLevel() >= Logger::DETAILED) {
 		std::ostringstream debug;
-		debug << "Scene structure:" << std::endl << task.getObject()->print_debug(10);
+		debug << "Scene structure:" << std::endl << task.getRenderableObject()->print_debug(10);
 		mLogger->println(debug.str(), Logger::DETAILED, true);
 	}
 

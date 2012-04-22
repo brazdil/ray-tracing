@@ -170,7 +170,7 @@ pScreen XML::parseScreen(XMLElement* xml_root, pCamera camera) {
 					parseColor(xml_elem_screen, "background")));
 }
 
-pIObject XML::parseObjects(XMLElement* xml_root) {
+pRenderable XML::parseObjects(XMLElement* xml_root) {
 	XMLElement* xml_elem_objects = xml_root->FirstChildElement("objects");
 	if (!xml_elem_objects)
 		throw std::runtime_error("Scene description doesn't contain objects information");
@@ -178,11 +178,11 @@ pIObject XML::parseObjects(XMLElement* xml_root) {
 	return parseObjectOrOperation(xml_elem_objects->FirstChildElement());
 }
 
-pIObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
+pRenderable XML::parseObjectOrOperation(XMLElement* xml_elem) {
 	if (!xml_elem)
 		throw std::invalid_argument("Expected object/operation");
 
-	vector<pIObject> sub_objects;
+	vector<pRenderable> sub_objects;
 
 	while (xml_elem) {
 		std::string name(xml_elem->Name());
@@ -204,22 +204,22 @@ pIObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
 	else if (sub_objects.size() == 1)
 		return sub_objects[0];
 	else
-		return pIObject(new Composite(sub_objects));
+		return pRenderable(new Composite(sub_objects));
 
 }
 
-pIObject XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
-	return pIObject(new Sphere());
+pRenderable XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
+	return pRenderable(new Sphere());
 }
 
-pIObject XML::parseOperation_Translate(XMLElement *xml_elem) {
+pRenderable XML::parseOperation_Translate(XMLElement *xml_elem) {
 	Vector3d delta(parseVector3d(xml_elem));
-	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	pRenderable obj = parseObjectOrOperation(xml_elem->FirstChildElement());
 	return obj->translate(delta);
 }
 
-pIObject XML::parseOperation_Scale(XMLElement *xml_elem) {
+pRenderable XML::parseOperation_Scale(XMLElement *xml_elem) {
 	double factor(parseDouble(xml_elem));
-	pIObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	pRenderable obj = parseObjectOrOperation(xml_elem->FirstChildElement());
 	return obj->scale(factor);
 }

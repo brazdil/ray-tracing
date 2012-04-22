@@ -38,23 +38,23 @@ void Sphere::init() {
 				  	  	       mCenter.data()[2] + mRadius);
 }
 
-vector< pair<const IObject*, double> > Sphere::ray_intersections(const Ray& ray) const {
+vector< pair<const Renderable*, double> > Sphere::ray_intersections(const Ray& ray) const {
 	Vector3d vec_center_to_ray_point = ray.getOrigin() - mCenter;
 	double a = ray.getDirection().dot(ray.getDirection());
 	double b = vec_center_to_ray_point.dot(2.0 * ray.getDirection());
 	double c = vec_center_to_ray_point.dot(vec_center_to_ray_point) - mRadius * mRadius;
 	double d = b*b - 4*a*c;
 
-	vector< pair<const IObject*, double> > intersections;
+	vector< pair<const Renderable*, double> > intersections;
 	if (isZero(d)) {
 		// one intersection
 		intersections.reserve(1);
-		intersections.push_back(pair<const IObject*, double>(this, (-b) / (2*a)));
+		intersections.push_back(pair<const Renderable*, double>(this, (-b) / (2*a)));
 	} else if (d > 0.0) {
 		// two intersections
 		intersections.reserve(2);
-		intersections.push_back(pair<const IObject*, double>(this, (-b + sqrt(d)) / (2*a)));
-		intersections.push_back(pair<const IObject*, double>(this, (-b - sqrt(d)) / (2*a)));
+		intersections.push_back(pair<const Renderable*, double>(this, (-b + sqrt(d)) / (2*a)));
+		intersections.push_back(pair<const Renderable*, double>(this, (-b - sqrt(d)) / (2*a)));
 	}
 
 	return intersections;
@@ -70,12 +70,12 @@ Vector3d Sphere::normal(const Vector3d& point_on_surface) const {
 	return unit_normal;
 }
 
-pIObject Sphere::translate(const Vector3d& delta) const {
-	return pIObject(new Sphere(mCenter + delta, mRadius, mNormalOutside));
+pRenderable Sphere::translate(const Vector3d& delta) const {
+	return pRenderable(new Sphere(mCenter + delta, mRadius, mNormalOutside));
 }
 
-pIObject Sphere::scale(double factor) const {
-	return pIObject(new Sphere(mCenter * factor, mRadius * factor, mNormalOutside));
+pRenderable Sphere::scale(double factor) const {
+	return pRenderable(new Sphere(mCenter * factor, mRadius * factor, mNormalOutside));
 }
 
 // rotate center (and top point)

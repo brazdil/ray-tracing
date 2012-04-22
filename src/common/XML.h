@@ -17,7 +17,6 @@
 #include "Camera.h"
 #include "Screen.h"
 
-#include "IObject.h"
 #include "Sphere.h"
 #include "Composite.h"
 
@@ -54,12 +53,12 @@ public:
 
 	static pCamera parseCamera(XMLElement* xml_root);
 	static pScreen parseScreen(XMLElement* xml_root, pCamera camera);
-	static pIObject parseObjects(XMLElement* xml_root);
+	static pRenderable parseObjects(XMLElement* xml_root);
 
-	static pIObject parseObjectOrOperation(XMLElement* xml);
-	static pIObject parseObject_Sphere(XMLElement* xml);
-	static pIObject parseOperation_Translate(XMLElement* xml);
-	static pIObject parseOperation_Scale(XMLElement* xml);
+	static pRenderable parseObjectOrOperation(XMLElement* xml);
+	static pRenderable parseObject_Sphere(XMLElement* xml);
+	static pRenderable parseOperation_Translate(XMLElement* xml);
+	static pRenderable parseOperation_Scale(XMLElement* xml);
 };
 
 #endif /* XML_H_ */

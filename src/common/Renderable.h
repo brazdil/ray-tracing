@@ -19,10 +19,10 @@
 
 using namespace std;
 
-class IObject;
-typedef boost::shared_ptr<IObject> pIObject;
+class Renderable;
+typedef boost::shared_ptr<Renderable> pRenderable;
 
-class IObject {
+class Renderable {
 
 	friend class Composite;
 
@@ -31,7 +31,7 @@ class IObject {
 	 * Each intersection is represented by the scalar multiplier of ray's direction vector, and the ELEMENTARY object it hit.
 	 * Should only return positive intersections!
 	 */
-	virtual vector< pair<const IObject*, double> > ray_intersections(const Ray& ray) const = 0;
+	virtual vector< pair<const Renderable*, double> > ray_intersections(const Ray& ray) const = 0;
 
 	/*
 	 * Return axis-aligned bounding box of the object
@@ -45,7 +45,7 @@ class IObject {
 
 public:
 
-	virtual ~IObject();
+	virtual ~Renderable();
 
 	class no_intersection_exception : public std::exception {
 	};
@@ -53,19 +53,19 @@ public:
 	/*
 	 * Returns first incident elementary object and the point of intersection
 	 */
-	pair<const IObject*, double> getFirstIntersection(const Ray& ray) const;
+	pair<const Renderable*, double> getFirstIntersection(const Ray& ray) const;
 
 	Color getColorAtIntersection(const Ray& ray) const;
 
 	/*
 	 * Translate
 	 */
-	virtual pIObject translate(const Vector3d& delta) const = 0;
+	virtual pRenderable translate(const Vector3d& delta) const = 0;
 
 	/*
 	 * Scale
 	 */
-	virtual pIObject scale(double factor) const = 0;
+	virtual pRenderable scale(double factor) const = 0;
 
 	/*
 	 * Print out information about the object

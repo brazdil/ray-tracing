@@ -70,7 +70,7 @@ Task::Task(pBinaryData input_file) {
 
 	mCamera = XML::parseCamera(xml_root);
 	mScreen = XML::parseScreen(xml_root, mCamera);
-	mObject = XML::parseObjects(xml_root);
+	mRenderableObject = XML::parseObjects(xml_root);
 }
 
 Task::~Task() {
@@ -85,6 +85,6 @@ pScreen Task::getScreen() {
 	return mScreen;
 }
 
-pIObject Task::getObject() {
-	return mObject;
+pRenderable Task::getRenderableObject() {
+	return mRenderableObject;
 }

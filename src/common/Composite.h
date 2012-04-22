@@ -8,28 +8,28 @@
 #ifndef COMPOSITE_H_
 #define COMPOSITE_H_
 
-#include "IObject.h"
+#include "Renderable.h"
 #include <vector>
 
 using namespace std;
 
-class Composite: public IObject {
+class Composite: public Renderable {
 private:
 
-	vector<pIObject> mObjects;
+	vector<pRenderable> mObjects;
 	BoundingBox mBoundingBox;
 
-	virtual vector< pair<const IObject*, double> > ray_intersections(const Ray& ray) const;
+	virtual vector< pair<const Renderable*, double> > ray_intersections(const Ray& ray) const;
 	virtual const BoundingBox& bounding_box() const;
 	virtual Vector3d normal(const Vector3d& point_on_surface) const;
 
 public:
 
-	Composite(vector<pIObject> objects);
+	Composite(vector<pRenderable> objects);
 	virtual ~Composite();
 
-	virtual pIObject translate(const Vector3d& delta) const;
-	virtual pIObject scale(double factor) const;
+	virtual pRenderable translate(const Vector3d& delta) const;
+	virtual pRenderable scale(double factor) const;
 	virtual std::string print_debug(unsigned int indent) const;
 };
 
