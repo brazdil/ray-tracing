@@ -21,28 +21,18 @@ Composite::Composite(vector<pObject> objects)
 Composite::~Composite() {
 }
 
-vector<IntersectionPair> Composite::ray_intersections(const Ray& ray) const {
-	vector<IntersectionPair> result;
-
+void Composite::ray_intersections(const Ray &ray, list<IntersectionPair> &result) const {
 	BOOST_FOREACH(pObject obj, mObjects)
-		BOOST_FOREACH(IntersectionPair i, obj->ray_intersections(ray))
-			result.push_back(i);
-
-	return result;
+		obj->ray_intersections(ray, result);
 }
 
 const BoundingBox& Composite::bounding_box() const {
 	return mBoundingBox;
 }
 
-vector<const Object*> Composite::filter(bool (*fn)(const Object*)) const {
-	vector<const Object*> result;
-
+void Composite::filter(list<const Object*> result, bool (*fn)(const Object*)) const {
 	BOOST_FOREACH(pObject obj, mObjects)
-		BOOST_FOREACH(const Object *filtered_obj, obj->filter(fn))
-			result.push_back(filtered_obj);
-
-	return result;
+		obj->filter(result, fn);
 }
 
 pObject Composite::translate(const Vector3d& delta) const {

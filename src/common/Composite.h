@@ -19,15 +19,15 @@ private:
 	vector<pObject> mObjects;
 	BoundingBox mBoundingBox;
 
-	virtual vector<IntersectionPair> ray_intersections(const Ray& ray) const;
+	virtual void filter(list<const Object*> result, bool (*fn)(const Object*)) const;
+
+	virtual void ray_intersections(const Ray &ray, list<IntersectionPair> &result) const;
 	virtual const BoundingBox& bounding_box() const;
 
 public:
 
 	Composite(vector<pObject> objects);
 	virtual ~Composite();
-
-	virtual vector<const Object*> filter(bool (*fn)(const Object*)) const;
 
 	virtual pObject translate(const Vector3d& delta) const;
 	virtual pObject scale(double factor) const;

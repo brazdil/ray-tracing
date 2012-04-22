@@ -16,8 +16,7 @@ NonRenderable::~NonRenderable() {
 
 }
 
-vector<IntersectionPair> NonRenderable::ray_intersections(const Ray& ray) const {
-	return vector<IntersectionPair>();
+void NonRenderable::ray_intersections(const Ray &ray, list<IntersectionPair> &result) const {
 }
 
 const BoundingBox& NonRenderable::bounding_box() const {

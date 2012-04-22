@@ -21,10 +21,11 @@ bool Light::filter_light(const Object* obj) {
 vector<const Light*> Light::filterLights(pObject object) {
 	vector<const Light*> result;
 
-	vector<const Object*> filtered = object->filter(filter_light);
-	result.reserve(filtered.size());
+	list<const Object*> temp;
+	object->filter(temp, filter_light);
 
-	BOOST_FOREACH(const Object* obj, filtered)
+	result.reserve(temp.size());
+	BOOST_FOREACH(const Object* obj, temp)
 		result.push_back(dynamic_cast<const Light*>(obj));
 
 	return result;

@@ -17,7 +17,8 @@ IntersectionPair Object::first_intersection(const Ray& ray) const {
 	if (!bounding_box().intersects(ray))
 		throw no_intersection_exception();
 
-	vector<IntersectionPair> intersections = ray_intersections(ray);
+	list<IntersectionPair> intersections;
+	ray_intersections(ray, intersections);
 	if (intersections.empty())
 		throw no_intersection_exception();
 
@@ -34,8 +35,7 @@ Color Object::getColorAtIntersection(const Ray& ray) const {
 	return Color((unsigned char) 012, (unsigned char) 123, (unsigned char) 234);
 }
 
-vector<const Object*> Object::filter(bool (*fn)(const Object*)) const {
-	vector<const Object*> result;
-	if (fn(this)) result.push_back(this);
-	return result;
+void Object::filter(list<const Object*> result, bool (*fn)(const Object*)) const {
+	if (fn(this))
+		result.push_back(this);
 }

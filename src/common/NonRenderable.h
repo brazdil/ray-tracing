@@ -18,7 +18,7 @@ using namespace std;
 class NonRenderable : public Object {
 private:
 
-	virtual vector<IntersectionPair> ray_intersections(const Ray& ray) const;
+	virtual void ray_intersections(const Ray &ray, list<IntersectionPair> &result) const;
 	virtual const BoundingBox& bounding_box() const;
 
 public:

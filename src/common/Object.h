@@ -14,6 +14,7 @@
 
 #include "utils.h"
 #include <vector>
+#include <list>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 
@@ -29,13 +30,21 @@ class Object {
 private:
 
 	friend class Composite;
+	friend class Light;
+
+	/*
+	 * Object passes "this" to the filter function, which should return true/false
+	 * whether it should be included in the result. The only difference is Composite,
+	 * which aggregates results of its sub-objects.
+	 */
+	virtual void filter(list<const Object*> result, bool (*fn)(const Object*)) const;
 
 	/*
 	 * Return list of all intersections between the object and a ray.
 	 * Each intersection is represented by the scalar multiplier of ray's direction vector, and the ELEMENTARY object it hit.
 	 * Should only return positive intersections!
 	 */
-	virtual vector<IntersectionPair> ray_intersections(const Ray& ray) const = 0;
+	virtual void ray_intersections(const Ray &ray, list<IntersectionPair> &result) const = 0;
 
 	/*
 	 * Return axis-aligned bounding box of the object
@@ -56,13 +65,6 @@ public:
 	 * Returns color of object that is hit by a ray, or throws no_intersection_exception.
 	 */
 	Color getColorAtIntersection(const Ray& ray) const;
-
-	/*
-	 * Object passes "this" to the filter function, which should return true/false
-	 * whether it should be included in the result. The only difference is Composite,
-	 * which aggregates results of its sub-objects.
-	 */
-	virtual vector<const Object*> filter(bool (*fn)(const Object*)) const;
 
 	/*
 	 * Translate
