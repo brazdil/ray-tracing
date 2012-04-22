@@ -18,7 +18,7 @@ private:
 	bool mNormalOutside;
 	BoundingBox mBoundingBox;
 
-	virtual vector< pair<const Renderable*, double> > ray_intersections(const Ray& ray) const;
+	virtual vector<IntersectionPair> ray_intersections(const Ray& ray) const;
 	virtual const BoundingBox& bounding_box() const;
 	virtual Vector3d normal(const Vector3d& point_on_surface) const;
 

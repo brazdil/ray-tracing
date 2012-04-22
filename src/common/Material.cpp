@@ -5,12 +5,12 @@
  *      Author: db538
  */
 
-#include "IMaterial.h"
+#include "Material.h"
 #include <stdexcept>
 
 using namespace boost;
 
-IMaterial::IMaterial(std::string name)
+Material::Material(std::string name)
 	: mName(name) {
 	// check settings
 	double reflect = portion_reflection();
@@ -27,9 +27,9 @@ IMaterial::IMaterial(std::string name)
 		throw std::runtime_error(str(format("Material \"%s\" can't have the sum of reflection and refraction coefficients greater than 1.0") % mName));
 }
 
-IMaterial::~IMaterial() {
+Material::~Material() {
 }
 
-double IMaterial::portion_material() const {
+double Material::portion_material() const {
 	return 1.0 - portion_reflection() - portion_refraction();
 }

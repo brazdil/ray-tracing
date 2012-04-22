@@ -11,14 +11,17 @@
 	</screen>
 	<materials>
 	</materials>
-	<lights>
-	</lights>
 	<objects>
 		<translate vector3="-0.5 0.6 4.0">
 			<scale double="0.6">
 				<sphere material="glossy_black" />
 			</scale>
-			<translate vector3="0.0 2.0 0.0">
+			<translate vector3="2.0 0.0 0.0">
+				<point-light>
+					<intensity color="FFFFFF" />
+				</point-light>
+			</translate>
+			<translate vector3="0.0 1.0 0.0">
 				<sphere material="glossy_black" />
 			</translate>
 		</translate>

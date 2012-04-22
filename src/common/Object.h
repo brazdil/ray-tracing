@@ -9,7 +9,9 @@
 #define OBJECT_H_
 
 #include "utils.h"
+#include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -20,6 +22,13 @@ class Object {
 public:
 	Object();
 	virtual ~Object();
+
+	/*
+	 * Object passes "this" to the filter function, which should return true/false
+	 * whether it should be included in the result. The only difference is Composite,
+	 * which aggregates results of its sub-objects.
+	 */
+	virtual vector<const Object*> filter(bool (*fn)(const Object*)) const;
 
 	/*
 	 * Translate

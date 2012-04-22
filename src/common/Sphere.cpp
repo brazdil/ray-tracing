@@ -38,23 +38,23 @@ void Sphere::init() {
 				  	  	       mCenter.data()[2] + mRadius);
 }
 
-vector< pair<const Renderable*, double> > Sphere::ray_intersections(const Ray& ray) const {
+vector<IntersectionPair> Sphere::ray_intersections(const Ray& ray) const {
 	Vector3d vec_center_to_ray_point = ray.getOrigin() - mCenter;
 	double a = ray.getDirection().dot(ray.getDirection());
 	double b = vec_center_to_ray_point.dot(2.0 * ray.getDirection());
 	double c = vec_center_to_ray_point.dot(vec_center_to_ray_point) - mRadius * mRadius;
 	double d = b*b - 4*a*c;
 
-	vector< pair<const Renderable*, double> > intersections;
+	vector< IntersectionPair > intersections;
 	if (isZero(d)) {
 		// one intersection
 		intersections.reserve(1);
-		intersections.push_back(pair<const Renderable*, double>(this, (-b) / (2*a)));
+		intersections.push_back(IntersectionPair(this, (-b) / (2*a)));
 	} else if (d > 0.0) {
 		// two intersections
 		intersections.reserve(2);
-		intersections.push_back(pair<const Renderable*, double>(this, (-b + sqrt(d)) / (2*a)));
-		intersections.push_back(pair<const Renderable*, double>(this, (-b - sqrt(d)) / (2*a)));
+		intersections.push_back(IntersectionPair(this, (-b + sqrt(d)) / (2*a)));
+		intersections.push_back(IntersectionPair(this, (-b - sqrt(d)) / (2*a)));
 	}
 
 	return intersections;

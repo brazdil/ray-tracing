@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "Screen.h"
 #include "Renderable.h"
+#include "Light.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -28,6 +29,7 @@ class Task {
 	pCamera mCamera;
 	pScreen mScreen;
 	pRenderable mRenderableObject;
+	vector<const Light*> mLights;
 
 public:
 	Task(pBinaryData input_file);
@@ -36,6 +38,7 @@ public:
 	pCamera getCamera();
 	pScreen getScreen();
 	pRenderable getRenderableObject();
+	vector<const Light*> getLights();
 };
 
 typedef shared_ptr<Task> pTask;

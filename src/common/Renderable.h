@@ -22,6 +22,8 @@ using namespace std;
 class Renderable;
 typedef boost::shared_ptr<Renderable> pRenderable;
 
+typedef pair<const Renderable*, double> IntersectionPair;
+
 class Renderable : public Object {
 
 	friend class Composite;
@@ -31,7 +33,7 @@ class Renderable : public Object {
 	 * Each intersection is represented by the scalar multiplier of ray's direction vector, and the ELEMENTARY object it hit.
 	 * Should only return positive intersections!
 	 */
-	virtual vector< pair<const Renderable*, double> > ray_intersections(const Ray& ray) const = 0;
+	virtual vector<IntersectionPair> ray_intersections(const Ray& ray) const = 0;
 
 	/*
 	 * Return axis-aligned bounding box of the object

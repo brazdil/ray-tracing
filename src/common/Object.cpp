@@ -8,11 +8,13 @@
 #include "Object.h"
 
 Object::Object() {
-	// TODO Auto-generated constructor stub
-
 }
 
 Object::~Object() {
-	// TODO Auto-generated destructor stub
 }
 
+vector<const Object*> Object::filter(bool (*fn)(const Object*)) const {
+	vector<const Object*> result;
+	if (fn(this)) result.push_back(this);
+	return result;
+}

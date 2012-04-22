@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <cstdio>
 #include <Eigen/Dense>
+#include "Color.h"
 
 using namespace Eigen;
 
@@ -45,6 +46,12 @@ inline bool isEqual(const Vector3d& v1, const Vector3d& v2) {
 inline std::string toString(const Vector3d& v) {
 	std::ostringstream str;
 	str << "[" << v.data()[0] << ", " << v.data()[1] << ", " << v.data()[2] << "]";
+	return str.str();
+}
+
+inline std::string toString(const Color& v) {
+	std::ostringstream str;
+	str << "[" << (int)(v.getUnsignedCharRed()) << ", " << (int)(v.getUnsignedCharGreen()) << ", " << (int)(v.getUnsignedCharBlue()) << "]";
 	return str.str();
 }
 

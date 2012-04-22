@@ -23,9 +23,9 @@ public:
 	Color(unsigned char r, unsigned char g, unsigned char b);
 	virtual ~Color();
 
-	unsigned char getUnsignedCharRed();
-	unsigned char getUnsignedCharGreen();
-	unsigned char getUnsignedCharBlue();
+	unsigned char getUnsignedCharRed() const;
+	unsigned char getUnsignedCharGreen() const;
+	unsigned char getUnsignedCharBlue() const;
 };
 
 #endif /* COLOR_H_ */

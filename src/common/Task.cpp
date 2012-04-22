@@ -71,10 +71,11 @@ Task::Task(pBinaryData input_file) {
 	mCamera = XML::parseCamera(xml_root);
 	mScreen = XML::parseScreen(xml_root, mCamera);
 	mRenderableObject = XML::parseObjects(xml_root);
+	mLights = Light::filterLights(mRenderableObject);
 }
 
 Task::~Task() {
-	// TODO Auto-generated destructor stub
+
 }
 
 pCamera Task::getCamera() {
@@ -87,4 +88,8 @@ pScreen Task::getScreen() {
 
 pRenderable Task::getRenderableObject() {
 	return mRenderableObject;
+}
+
+vector<const Light*> Task::getLights() {
+	return mLights;
 }

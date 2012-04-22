@@ -56,9 +56,15 @@ Master::Master(pLogger logger,
 	Task task(mInputFile);
 
 	if (mLogger->getLevel() >= Logger::DETAILED) {
-		std::ostringstream debug;
-		debug << "Scene structure:" << std::endl << task.getRenderableObject()->print_debug(10);
-		mLogger->println(debug.str(), Logger::DETAILED, true);
+		std::ostringstream debug_scene, debug_lights;
+
+		debug_scene << "Scene structure:" << std::endl << task.getRenderableObject()->print_debug(10);
+		mLogger->println(debug_scene.str(), Logger::DETAILED, false);
+
+		debug_lights << "List of lights:" << std::endl;
+		BOOST_FOREACH(const Light* light, task.getLights())
+			debug_lights << light->print_debug(10);
+		mLogger->println(debug_lights.str(), Logger::DETAILED, false);
 	}
 
 	// compute height from scene data

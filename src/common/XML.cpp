@@ -190,6 +190,8 @@ pRenderable XML::parseObjectOrOperation(XMLElement* xml_elem) {
 
 		if (name == "sphere")
 			renderable_objects.push_back(parseObject_Sphere(xml_elem));
+		else if (name == "point-light")
+			associated_objects.push_back(parseObject_PointLight(xml_elem));
 		else if (name == "translate")
 			renderable_objects.push_back(parseOperation_Translate(xml_elem));
 		else if (name == "scale")
@@ -209,8 +211,13 @@ pRenderable XML::parseObjectOrOperation(XMLElement* xml_elem) {
 
 }
 
-pRenderable XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
+pRenderable XML::parseObject_Sphere(XMLElement* xml_elem) {
 	return pRenderable(new Sphere());
+}
+
+pObject XML::parseObject_PointLight(XMLElement* xml_elem) {
+	Color intensity(parseColor(xml_elem, "intensity"));
+	return pObject(new PointLight(intensity));
 }
 
 pRenderable XML::parseOperation_Translate(XMLElement *xml_elem) {

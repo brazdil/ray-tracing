@@ -20,6 +20,8 @@
 #include "Sphere.h"
 #include "Composite.h"
 
+#include "PointLight.h"
+
 using namespace tinyxml2;
 using namespace Eigen;
 
@@ -57,6 +59,7 @@ public:
 
 	static pRenderable parseObjectOrOperation(XMLElement* xml);
 	static pRenderable parseObject_Sphere(XMLElement* xml);
+	static pObject parseObject_PointLight(XMLElement* xml);
 	static pRenderable parseOperation_Translate(XMLElement* xml);
 	static pRenderable parseOperation_Scale(XMLElement* xml);
 };

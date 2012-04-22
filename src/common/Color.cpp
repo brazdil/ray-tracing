@@ -32,17 +32,16 @@ void Color::init() {
 }
 
 Color::~Color() {
-	// TODO Auto-generated destructor stub
 }
 
-unsigned char Color::getUnsignedCharRed() {
+unsigned char Color::getUnsignedCharRed() const {
 	return (unsigned char) (mR * 255.0);
 }
 
-unsigned char Color::getUnsignedCharGreen() {
+unsigned char Color::getUnsignedCharGreen() const {
 	return (unsigned char) (mG * 255.0);
 }
 
-unsigned char Color::getUnsignedCharBlue() {
+unsigned char Color::getUnsignedCharBlue() const {
 	return (unsigned char) (mB * 255.0);
 }
