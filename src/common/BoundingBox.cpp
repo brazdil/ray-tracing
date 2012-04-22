@@ -6,25 +6,46 @@
  */
 
 #include "BoundingBox.h"
-#include <limits>
+#include <stdexcept>
+
+const BoundingBox BoundingBox::null;
 
 BoundingBox::BoundingBox()
-	: mXMin(std::numeric_limits<double>::quiet_NaN()),
-	  mXMax(std::numeric_limits<double>::quiet_NaN()),
-	  mYMin(std::numeric_limits<double>::quiet_NaN()),
-	  mYMax(std::numeric_limits<double>::quiet_NaN()),
-	  mZMin(std::numeric_limits<double>::quiet_NaN()),
-	  mZMax(std::numeric_limits<double>::quiet_NaN()) {
+	: mNull(true) {
 }
 
 BoundingBox::BoundingBox(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
-	: mXMin(xmin), mXMax(xmax), mYMin(ymin), mYMax(ymax), mZMin(zmin), mZMax(zmax) {
+	: mNull(false),
+	  mXMin(xmin),
+	  mXMax(xmax),
+	  mYMin(ymin),
+	  mYMax(ymax),
+	  mZMin(zmin),
+	  mZMax(zmax) {
+	if (mXMin >= mXMax || mYMin >= mYMax || mZMin >= mZMax)
+		throw std::invalid_argument("BoundingBox: min boundaries must be less than max boundaries");
+}
+
+BoundingBox::BoundingBox(const BoundingBox* copy)
+	: mNull(copy->mNull),
+	  mXMin(copy->mXMin),
+	  mXMax(copy->mXMax),
+	  mYMin(copy->mYMin),
+	  mYMax(copy->mYMax),
+	  mZMin(copy->mZMin),
+	  mZMax(copy->mZMax) {
 }
 
 BoundingBox::~BoundingBox() {
 }
 
 BoundingBox BoundingBox::merge(const BoundingBox& another) const {
+	if (this->mNull)
+		return another;
+
+	if (another.mNull)
+		return BoundingBox(this);
+
 	return BoundingBox(
 				(this->mXMin < another.mXMin) ? this->mXMin : another.mXMin,
 				(this->mXMax > another.mXMax) ? this->mXMax : another.mXMax,
@@ -35,6 +56,9 @@ BoundingBox BoundingBox::merge(const BoundingBox& another) const {
 }
 
 bool BoundingBox::intersects(const Ray& ray) const {
+	if (mNull)
+		return false;
+
 	switch (ray.getClassification())
 	{
 	case Ray::MMM:
@@ -152,27 +176,3 @@ bool BoundingBox::intersects(const Ray& ray) const {
 
 	return false;
 }
-
-//double BoundingBox::getXMin() const {
-//	return mXMin;
-//}
-//
-//double BoundingBox::getXMax() const {
-//	return mXMax;
-//}
-//
-//double BoundingBox::getYMin() const {
-//	return mYMin;
-//}
-//
-//double BoundingBox::getYMax() const {
-//	return mYMax;
-//}
-//
-//double BoundingBox::getZMin() const {
-//	return mZMin;
-//}
-//
-//double BoundingBox::getZMax() const {
-//	return mZMax;
-//}

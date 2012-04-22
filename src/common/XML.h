@@ -55,13 +55,13 @@ public:
 
 	static pCamera parseCamera(XMLElement* xml_root);
 	static pScreen parseScreen(XMLElement* xml_root, pCamera camera);
-	static pRenderable parseObjects(XMLElement* xml_root);
+	static pObject parseObjects(XMLElement* xml_root);
 
-	static pRenderable parseObjectOrOperation(XMLElement* xml);
-	static pRenderable parseObject_Sphere(XMLElement* xml);
+	static pObject parseObjectOrOperation(XMLElement* xml);
+	static pObject parseObject_Sphere(XMLElement* xml);
 	static pObject parseObject_PointLight(XMLElement* xml);
-	static pRenderable parseOperation_Translate(XMLElement* xml);
-	static pRenderable parseOperation_Scale(XMLElement* xml);
+	static pObject parseOperation_Translate(XMLElement* xml);
+	static pObject parseOperation_Scale(XMLElement* xml);
 };
 
 #endif /* XML_H_ */

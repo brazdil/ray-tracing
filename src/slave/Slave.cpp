@@ -130,9 +130,9 @@ void Slave::compute_pixel(socket_ptr sock, pTask task, pThreadSemaphore thread_s
 
 	Color result = task->getScreen()->getBackgroundColor();
 	try {
-		result = task->getRenderableObject()->getColorAtIntersection(
+		result = task->getSceneObject()->getColorAtIntersection(
 			task->getScreen()->getRay(image_width, col, row));
-	} catch (Renderable::no_intersection_exception&) {
+	} catch (NonRenderable::no_intersection_exception&) {
 		// no need to handle
 	}
 

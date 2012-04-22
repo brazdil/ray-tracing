@@ -10,7 +10,7 @@
 
 #include "Camera.h"
 #include "Screen.h"
-#include "Renderable.h"
+#include "Object.h"
 #include "Light.h"
 
 #include <vector>
@@ -28,7 +28,7 @@ inline pBinaryData create_binary_data(long len) {
 class Task {
 	pCamera mCamera;
 	pScreen mScreen;
-	pRenderable mRenderableObject;
+	pObject mSceneObject;
 	vector<const Light*> mLights;
 
 public:
@@ -37,7 +37,7 @@ public:
 
 	pCamera getCamera();
 	pScreen getScreen();
-	pRenderable getRenderableObject();
+	pObject getSceneObject();
 	vector<const Light*> getLights();
 };
 

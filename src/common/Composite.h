@@ -8,25 +8,23 @@
 #ifndef COMPOSITE_H_
 #define COMPOSITE_H_
 
-#include "Renderable.h"
+#include "Object.h"
 #include <vector>
 
 using namespace std;
 
-class Composite: public Renderable {
+class Composite: public Object {
 private:
 
-	vector<pRenderable> mRenderableObjects;
-	vector<pObject> mAssociatedObjects;
+	vector<pObject> mObjects;
 	BoundingBox mBoundingBox;
 
 	virtual vector<IntersectionPair> ray_intersections(const Ray& ray) const;
 	virtual const BoundingBox& bounding_box() const;
-	virtual Vector3d normal(const Vector3d& point_on_surface) const;
 
 public:
 
-	Composite(vector<pRenderable> renderable_objects, vector<pObject> associated_objects);
+	Composite(vector<pObject> objects);
 	virtual ~Composite();
 
 	virtual vector<const Object*> filter(bool (*fn)(const Object*)) const;

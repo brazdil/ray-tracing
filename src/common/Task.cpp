@@ -70,8 +70,8 @@ Task::Task(pBinaryData input_file) {
 
 	mCamera = XML::parseCamera(xml_root);
 	mScreen = XML::parseScreen(xml_root, mCamera);
-	mRenderableObject = XML::parseObjects(xml_root);
-	mLights = Light::filterLights(mRenderableObject);
+	mSceneObject = XML::parseObjects(xml_root);
+	mLights = Light::filterLights(mSceneObject);
 }
 
 Task::~Task() {
@@ -86,8 +86,8 @@ pScreen Task::getScreen() {
 	return mScreen;
 }
 
-pRenderable Task::getRenderableObject() {
-	return mRenderableObject;
+pObject Task::getSceneObject() {
+	return mSceneObject;
 }
 
 vector<const Light*> Task::getLights() {

@@ -170,7 +170,7 @@ pScreen XML::parseScreen(XMLElement* xml_root, pCamera camera) {
 					parseColor(xml_elem_screen, "background")));
 }
 
-pRenderable XML::parseObjects(XMLElement* xml_root) {
+pObject XML::parseObjects(XMLElement* xml_root) {
 	XMLElement* xml_elem_objects = xml_root->FirstChildElement("objects");
 	if (!xml_elem_objects)
 		throw std::runtime_error("Scene description doesn't contain objects information");
@@ -178,41 +178,40 @@ pRenderable XML::parseObjects(XMLElement* xml_root) {
 	return parseObjectOrOperation(xml_elem_objects->FirstChildElement());
 }
 
-pRenderable XML::parseObjectOrOperation(XMLElement* xml_elem) {
+pObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
 	if (!xml_elem)
 		throw std::invalid_argument("Expected object/operation");
 
-	vector<pRenderable> renderable_objects;
-	vector<pObject> associated_objects;
+	vector<pObject> objects;
 
 	while (xml_elem) {
 		std::string name(xml_elem->Name());
 
 		if (name == "sphere")
-			renderable_objects.push_back(parseObject_Sphere(xml_elem));
+			objects.push_back(parseObject_Sphere(xml_elem));
 		else if (name == "point-light")
-			associated_objects.push_back(parseObject_PointLight(xml_elem));
+			objects.push_back(parseObject_PointLight(xml_elem));
 		else if (name == "translate")
-			renderable_objects.push_back(parseOperation_Translate(xml_elem));
+			objects.push_back(parseOperation_Translate(xml_elem));
 		else if (name == "scale")
-			renderable_objects.push_back(parseOperation_Scale(xml_elem));
+			objects.push_back(parseOperation_Scale(xml_elem));
 		else
 			throw std::invalid_argument(boost::str(boost::format("Invalid object/operation type \"%s\"") % name));
 
 		xml_elem = xml_elem->NextSiblingElement();
 	}
 
-	if (renderable_objects.empty() && associated_objects.empty())
+	if (objects.empty())
 		throw std::invalid_argument("Expected at least one sub-object/operation");
-	else if (renderable_objects.size() == 1 && associated_objects.empty())
-		return renderable_objects[0];
+	else if (objects.size() == 1)
+		return objects[0];
 	else
-		return pRenderable(new Composite(renderable_objects, associated_objects));
+		return pObject(new Composite(objects));
 
 }
 
-pRenderable XML::parseObject_Sphere(XMLElement* xml_elem) {
-	return pRenderable(new Sphere());
+pObject XML::parseObject_Sphere(XMLElement* xml_elem) {
+	return pObject(new Sphere());
 }
 
 pObject XML::parseObject_PointLight(XMLElement* xml_elem) {
@@ -220,14 +219,14 @@ pObject XML::parseObject_PointLight(XMLElement* xml_elem) {
 	return pObject(new PointLight(intensity));
 }
 
-pRenderable XML::parseOperation_Translate(XMLElement *xml_elem) {
+pObject XML::parseOperation_Translate(XMLElement *xml_elem) {
 	Vector3d delta(parseVector3d(xml_elem));
-	pRenderable obj = parseObjectOrOperation(xml_elem->FirstChildElement());
-	return boost::dynamic_pointer_cast<Renderable>(obj->translate(delta));
+	pObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	return obj->translate(delta);
 }
 
-pRenderable XML::parseOperation_Scale(XMLElement *xml_elem) {
+pObject XML::parseOperation_Scale(XMLElement *xml_elem) {
 	double factor(parseDouble(xml_elem));
-	pRenderable obj = parseObjectOrOperation(xml_elem->FirstChildElement());
-	return boost::dynamic_pointer_cast<Renderable>(obj->scale(factor));
+	pObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	return obj->scale(factor);
 }

@@ -12,9 +12,13 @@
 
 class BoundingBox {
 
+	bool mNull;
+
 	double mXMin, mXMax;
 	double mYMin, mYMax;
 	double mZMin, mZMax;
+
+	BoundingBox(const BoundingBox* copy);
 
 public:
 
@@ -25,12 +29,7 @@ public:
 	BoundingBox merge(const BoundingBox& another) const;
 	bool intersects(const Ray& ray) const;
 
-//	double getXMin() const;
-//	double getXMax() const;
-//	double getYMin() const;
-//	double getYMax() const;
-//	double getZMin() const;
-//	double getZMax() const;
+	static const BoundingBox null;
 };
 
 #endif /* BOUNDINGBOX_H_ */

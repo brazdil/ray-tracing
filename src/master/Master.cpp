@@ -60,7 +60,7 @@ Master::Master(pLogger logger,
 		unsigned int indent = mLogger->getTitle().length() + 4; // 2 for ": " and 2 for true indent
 
 		debug_scene << "Scene structure:" << std::endl
-				    << task.getRenderableObject()->print_debug(indent);
+				    << task.getSceneObject()->print_debug(indent);
 		mLogger->println(debug_scene.str(), Logger::DETAILED, false);
 
 		debug_lights << "List of lights:" << std::endl;

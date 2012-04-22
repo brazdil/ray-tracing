@@ -8,13 +8,12 @@
 #ifndef LIGHT_H_
 #define LIGHT_H_
 
-#include "Object.h"
+#include "NonRenderable.h"
 #include "Color.h"
 
-class Light: public Object {
+class Light: public NonRenderable {
 private:
 	static bool filter_light(const Object*);
-
 public:
 	Light();
 	virtual ~Light();

@@ -8,9 +8,9 @@
 #ifndef SPHERE_H_
 #define SPHERE_H_
 
-#include "Renderable.h"
+#include "SurfaceObject.h"
 
-class Sphere: public Renderable {
+class Sphere: public SurfaceObject {
 private:
 
 	Vector3d mCenter;
