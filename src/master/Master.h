@@ -13,6 +13,8 @@
 #include "../common/Task.h"
 #include "ResultManager.h"
 
+#include <vector>
+#include <list>
 #include <boost/thread.hpp>
 
 using namespace boost;
@@ -49,7 +51,7 @@ private:
 	pBinaryData mInputFile;
 
 	mutex mTasksLock;
-	vector<pPartialTask> mTaskList;
+	list<pPartialTask> mTaskList;
 
 	mutex mWorkersLock;
 	vector<pThread> mWorkersList;

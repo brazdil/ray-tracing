@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <algorithm>
+#include <boost/foreach.hpp>
 
 const char Master::mVersion = 1;
 
@@ -184,7 +185,7 @@ void Master::protocol_assignment_loop(socket_ptr sock, string client_address) {
 		pPartialTask task;
 		{
 			mutex::scoped_lock lock(mTasksLock);
-			for (vector<pPartialTask>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
+			for (list<pPartialTask>::iterator it = mTaskList.begin(); it != mTaskList.end(); it++)
 				if ((*it)->state == PartialTask::PENDING) {
 					task = *it;
 					task->state = PartialTask::IN_PROGRESS;
@@ -200,6 +201,12 @@ void Master::protocol_assignment_loop(socket_ptr sock, string client_address) {
 				{
 					mutex::scoped_lock lock(mTasksLock);
 					task->state = PartialTask::FINISHED;
+					// remove it from the list
+					for (list<pPartialTask>::iterator it = mTaskList.begin(); it != mTaskList.end(); it++)
+						if ((*it) == task) {
+							mTaskList.erase(it);
+							break;
+						}
 				}
 			} catch (std::exception& e) {
 				mLogger->println(format("%s - Error while working on task, putting it back in the queue") % client_address, Logger::DETAILED);
@@ -212,12 +219,7 @@ void Master::protocol_assignment_loop(socket_ptr sock, string client_address) {
 		} else {
 			{
 				mutex::scoped_lock lock(mTasksLock);
-				task_finished = true;
-				for (vector<pPartialTask>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
-					if ((*it)->state != PartialTask::FINISHED) {
-						task_finished = false;
-						break;
-					}
+				task_finished = mTaskList.empty();
 			}
 			if (task_finished) {
 				protocol_assignment_loop_send_finished(sock, client_address);
@@ -321,6 +323,8 @@ void Master::handle_connection(socket_ptr sock) {
 void Master::run() {
 	mLogger->println(format("Starting master on port %d...") % mPort, Logger::INFORMATIVE);
 
+	vector<pPartialTask> tmp_work_queue;
+
 	// create a queue with image parts
 	mLogger->println("Creating work queue", Logger::DETAILED);
 	unsigned int col_width = mImageWidth / mWorkDivision;
@@ -329,10 +333,15 @@ void Master::run() {
 		part->col_from = i * col_width;
 		if (i < mWorkDivision - 1) part->col_to = (i + 1) * col_width;
 		else                       part->col_to = mImageWidth;
-		mTaskList.push_back(part);
+		tmp_work_queue.push_back(part);
 	}
+
 	// shuffle parts, just for fun
-	random_shuffle(mTaskList.begin(), mTaskList.end());
+	random_shuffle(tmp_work_queue.begin(), tmp_work_queue.end());
+
+	// move to the real work queue
+	BOOST_FOREACH(pPartialTask task, tmp_work_queue)
+		mTaskList.push_back(task);
 
 	// clear the workers list
 	mWorkersList.clear();
@@ -353,16 +362,11 @@ void Master::run() {
 	// wait for everyone to finish
 	bool task_finished = false;
 	while (!task_finished) {
+		this_thread::sleep(posix_time::seconds(2));
 		{
 			mutex::scoped_lock lock(mTasksLock);
-			task_finished = true;
-			for (vector<pPartialTask>::iterator it = mTaskList.begin(); it < mTaskList.end(); it++)
-				if ((*it)->state != PartialTask::FINISHED) {
-					task_finished = false;
-					break;
-				}
+			task_finished = mTaskList.empty();
 		}
-		this_thread::sleep(posix_time::seconds(2));
 	}
 
 	// lock the data structures, so that no worker can change it any more
