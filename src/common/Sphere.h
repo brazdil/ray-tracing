@@ -28,8 +28,8 @@ public:
 	Sphere(Vector3d center, double radius, bool normal_outside);
 	virtual ~Sphere();
 
-	virtual pRenderable translate(const Vector3d& delta) const;
-	virtual pRenderable scale(double factor) const;
+	virtual pObject translate(const Vector3d& delta) const;
+	virtual pObject scale(double factor) const;
 	virtual std::string print_debug(unsigned int indent) const;
 };
 

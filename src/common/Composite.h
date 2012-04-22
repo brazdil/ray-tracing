@@ -16,7 +16,8 @@ using namespace std;
 class Composite: public Renderable {
 private:
 
-	vector<pRenderable> mObjects;
+	vector<pRenderable> mRenderableObjects;
+	vector<pObject> mAssociatedObjects;
 	BoundingBox mBoundingBox;
 
 	virtual vector< pair<const Renderable*, double> > ray_intersections(const Ray& ray) const;
@@ -25,11 +26,11 @@ private:
 
 public:
 
-	Composite(vector<pRenderable> objects);
+	Composite(vector<pRenderable> renderable_objects, vector<pObject> associated_objects);
 	virtual ~Composite();
 
-	virtual pRenderable translate(const Vector3d& delta) const;
-	virtual pRenderable scale(double factor) const;
+	virtual pObject translate(const Vector3d& delta) const;
+	virtual pObject scale(double factor) const;
 	virtual std::string print_debug(unsigned int indent) const;
 };
 

@@ -70,12 +70,12 @@ Vector3d Sphere::normal(const Vector3d& point_on_surface) const {
 	return unit_normal;
 }
 
-pRenderable Sphere::translate(const Vector3d& delta) const {
-	return pRenderable(new Sphere(mCenter + delta, mRadius, mNormalOutside));
+pObject Sphere::translate(const Vector3d& delta) const {
+	return pObject(new Sphere(mCenter + delta, mRadius, mNormalOutside));
 }
 
-pRenderable Sphere::scale(double factor) const {
-	return pRenderable(new Sphere(mCenter * factor, mRadius * factor, mNormalOutside));
+pObject Sphere::scale(double factor) const {
+	return pObject(new Sphere(mCenter * factor, mRadius * factor, mNormalOutside));
 }
 
 // rotate center (and top point)

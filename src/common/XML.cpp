@@ -182,29 +182,30 @@ pRenderable XML::parseObjectOrOperation(XMLElement* xml_elem) {
 	if (!xml_elem)
 		throw std::invalid_argument("Expected object/operation");
 
-	vector<pRenderable> sub_objects;
+	vector<pRenderable> renderable_objects;
+	vector<pObject> associated_objects;
 
 	while (xml_elem) {
 		std::string name(xml_elem->Name());
 
 		if (name == "sphere")
-			sub_objects.push_back(parseObject_Sphere(xml_elem));
+			renderable_objects.push_back(parseObject_Sphere(xml_elem));
 		else if (name == "translate")
-			sub_objects.push_back(parseOperation_Translate(xml_elem));
+			renderable_objects.push_back(parseOperation_Translate(xml_elem));
 		else if (name == "scale")
-			sub_objects.push_back(parseOperation_Scale(xml_elem));
+			renderable_objects.push_back(parseOperation_Scale(xml_elem));
 		else
 			throw std::invalid_argument(boost::str(boost::format("Invalid object/operation type \"%s\"") % name));
 
 		xml_elem = xml_elem->NextSiblingElement();
 	}
 
-	if (sub_objects.size() < 1)
+	if (renderable_objects.empty() && associated_objects.empty())
 		throw std::invalid_argument("Expected at least one sub-object/operation");
-	else if (sub_objects.size() == 1)
-		return sub_objects[0];
+	else if (renderable_objects.size() == 1 && associated_objects.empty())
+		return renderable_objects[0];
 	else
-		return pRenderable(new Composite(sub_objects));
+		return pRenderable(new Composite(renderable_objects, associated_objects));
 
 }
 
@@ -215,11 +216,11 @@ pRenderable XML::parseObject_Sphere(XMLElement* xml_elem_sphere) {
 pRenderable XML::parseOperation_Translate(XMLElement *xml_elem) {
 	Vector3d delta(parseVector3d(xml_elem));
 	pRenderable obj = parseObjectOrOperation(xml_elem->FirstChildElement());
-	return obj->translate(delta);
+	return boost::dynamic_pointer_cast<Renderable>(obj->translate(delta));
 }
 
 pRenderable XML::parseOperation_Scale(XMLElement *xml_elem) {
 	double factor(parseDouble(xml_elem));
 	pRenderable obj = parseObjectOrOperation(xml_elem->FirstChildElement());
-	return obj->scale(factor);
+	return boost::dynamic_pointer_cast<Renderable>(obj->scale(factor));
 }

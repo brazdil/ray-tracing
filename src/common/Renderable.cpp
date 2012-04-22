@@ -12,8 +12,12 @@ Renderable::~Renderable() {
 }
 
 pair<const Renderable*, double> Renderable::getFirstIntersection(const Ray& ray) const {
-	if (!bounding_box().intersects(ray))
+	try {
+		if (!bounding_box().intersects(ray))
+			throw no_intersection_exception();
+	} catch (not_renderable_exception&) {
 		throw no_intersection_exception();
+	}
 
 	vector< pair<const Renderable*, double> > intersections = ray_intersections(ray);
 	if (intersections.empty())

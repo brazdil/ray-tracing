@@ -5,9 +5,10 @@
  *      Author: db538
  */
 
-#ifndef IOBJECT_H_
-#define IOBJECT_H_
+#ifndef RENDERABLE_H_
+#define RENDERABLE_H_
 
+#include "Object.h"
 #include "Ray.h"
 #include "BoundingBox.h"
 #include "Color.h"
@@ -15,14 +16,13 @@
 #include <vector>
 #include <utility>
 #include <stdexcept>
-#include <boost/shared_ptr.hpp>
 
 using namespace std;
 
 class Renderable;
 typedef boost::shared_ptr<Renderable> pRenderable;
 
-class Renderable {
+class Renderable : public Object {
 
 	friend class Composite;
 
@@ -47,8 +47,8 @@ public:
 
 	virtual ~Renderable();
 
-	class no_intersection_exception : public std::exception {
-	};
+	class no_intersection_exception : public std::exception { };
+	class not_renderable_exception : public std::exception { };
 
 	/*
 	 * Returns first incident elementary object and the point of intersection
@@ -56,21 +56,6 @@ public:
 	pair<const Renderable*, double> getFirstIntersection(const Ray& ray) const;
 
 	Color getColorAtIntersection(const Ray& ray) const;
-
-	/*
-	 * Translate
-	 */
-	virtual pRenderable translate(const Vector3d& delta) const = 0;
-
-	/*
-	 * Scale
-	 */
-	virtual pRenderable scale(double factor) const = 0;
-
-	/*
-	 * Print out information about the object
-	 */
-	virtual std::string print_debug(unsigned int indent = 0) const = 0;
 };
 
-#endif /* IOBJECT_H_ */
+#endif /* RENDERABLE_H_ */
