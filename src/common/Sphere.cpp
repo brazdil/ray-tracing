@@ -65,7 +65,7 @@ const BoundingBox& Sphere::bounding_box() const {
 }
 
 Vector3d Sphere::normal(const Vector3d& point_on_surface) const {
-	Vector3d unit_normal = point_on_surface - mCenter;
+	Vector3d unit_normal = mNormalOutside ? point_on_surface - mCenter : mCenter - point_on_surface;
 	unit_normal.normalize();
 	return unit_normal;
 }
