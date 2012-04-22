@@ -57,13 +57,15 @@ Master::Master(pLogger logger,
 
 	if (mLogger->getLevel() >= Logger::DETAILED) {
 		std::ostringstream debug_scene, debug_lights;
+		unsigned int indent = mLogger->getTitle().length() + 4; // 2 for ": " and 2 for true indent
 
-		debug_scene << "Scene structure:" << std::endl << task.getRenderableObject()->print_debug(10);
+		debug_scene << "Scene structure:" << std::endl
+				    << task.getRenderableObject()->print_debug(indent);
 		mLogger->println(debug_scene.str(), Logger::DETAILED, false);
 
 		debug_lights << "List of lights:" << std::endl;
 		BOOST_FOREACH(const Light* light, task.getLights())
-			debug_lights << light->print_debug(10);
+			debug_lights << light->print_debug(indent);
 		mLogger->println(debug_lights.str(), Logger::DETAILED, false);
 	}
 

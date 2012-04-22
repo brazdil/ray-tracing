@@ -33,6 +33,7 @@ public:
 	int  getLevel();
 	void setLevel(int level);
 
+	std::string getTitle();
 	void setTitle(std::string title);
 
 	void println(boost::basic_format<char> format, MessageImportance level, bool print_endl = true);

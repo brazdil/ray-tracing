@@ -36,6 +36,11 @@ void Logger::setLevel(int level) {
 		mMaxLevel = level;
 }
 
+std::string Logger::getTitle() {
+	boost::recursive_mutex::scoped_lock lock(mObjectLock);
+	return mTitle;
+}
+
 void Logger::setTitle(std::string title) {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
 	mTitle = title;
