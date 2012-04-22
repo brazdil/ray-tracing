@@ -96,7 +96,7 @@ void Logger::println(std::string message, MessageImportance level, bool print_en
 
 void Logger::clearProgressBar() {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
-	if (mProgressBar_Enabled) {
+	if (mProgressBar_Enabled && mMaxLevel > ERROR) {
 		std::cerr << "\r";
 		for (int i = 0; i < 35; ++i)
 			std::cerr << " ";
@@ -106,7 +106,7 @@ void Logger::clearProgressBar() {
 
 void Logger::printProgressBar(bool force) {
 	boost::recursive_mutex::scoped_lock lock(mObjectLock);
-	if (mProgressBar_Enabled) {
+	if (mProgressBar_Enabled && mMaxLevel > ERROR) {
 		int last = mProgressBar_LastValue * 1000 / mProgressBar_Max;
 		int now = mProgressBar_Value * 1000 / mProgressBar_Max;
 		if (force || now != last) {
