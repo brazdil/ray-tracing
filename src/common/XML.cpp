@@ -26,6 +26,13 @@ std::string XML::getParameter(XMLElement *elem, std::string type) {
 	return std::string(subelem_type->Value());
 }
 
+pMaterial XML::getMaterial(std::string name, list<pMaterial> materials) {
+	BOOST_FOREACH(pMaterial mat, materials)
+		if (mat->getName() == name)
+			return mat;
+	throw std::invalid_argument(str(format("Material \"%s\" not found") % name));
+}
+
 double XML::parseDouble(XMLElement* xml, std::string property) {
 	return parseDouble(getProperty(xml, property, "double"));
 }
@@ -170,15 +177,46 @@ pScreen XML::parseScreen(XMLElement* xml_root, pCamera camera) {
 					parseColor(xml_elem_screen, "background")));
 }
 
-pObject XML::parseObjects(XMLElement* xml_root) {
+list<pMaterial> XML::parseMaterials(XMLElement* xml_root) {
+	XMLElement* xml_elem_materials = xml_root->FirstChildElement("materials");
+	if (!xml_elem_materials)
+		throw std::runtime_error("Scene description doesn't contain materials information");
+
+	list<pMaterial> materials;
+
+	XMLElement* xml_child = xml_elem_materials->FirstChildElement();
+	while (xml_child) {
+		std::string mat_type(xml_child->Name());
+
+		if (mat_type == "solid")
+			materials.push_back(parseSolidMaterial(xml_child));
+		else
+			throw std::invalid_argument(boost::str(boost::format("Invalid material type \"%s\"") % mat_type));
+
+		xml_child = xml_child->NextSiblingElement();
+	}
+
+	return materials;
+}
+
+pMaterial XML::parseSolidMaterial(XMLElement* xml) {
+	return pMaterial(new SolidMaterial(
+			getParameter(xml, "id"),
+			parseColor(xml, "diffuse"),
+			parseColor(xml, "specular"),
+			parseColor(xml, "transmit"),
+			parseDouble(xml, "refractive-index")));
+}
+
+pObject XML::parseObjects(XMLElement* xml_root, list<pMaterial> materials) {
 	XMLElement* xml_elem_objects = xml_root->FirstChildElement("objects");
 	if (!xml_elem_objects)
 		throw std::runtime_error("Scene description doesn't contain objects information");
 
-	return parseObjectOrOperation(xml_elem_objects->FirstChildElement());
+	return parseObjectOrOperation(xml_elem_objects->FirstChildElement(), materials);
 }
 
-pObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
+pObject XML::parseObjectOrOperation(XMLElement* xml_elem, list<pMaterial> materials) {
 	if (!xml_elem)
 		throw std::invalid_argument("Expected object/operation");
 
@@ -188,13 +226,13 @@ pObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
 		std::string name(xml_elem->Name());
 
 		if (name == "sphere")
-			objects.push_back(parseObject_Sphere(xml_elem));
+			objects.push_back(parseObject_Sphere(xml_elem, materials));
 		else if (name == "point-light")
 			objects.push_back(parseObject_PointLight(xml_elem));
 		else if (name == "translate")
-			objects.push_back(parseOperation_Translate(xml_elem));
+			objects.push_back(parseOperation_Translate(xml_elem, materials));
 		else if (name == "scale")
-			objects.push_back(parseOperation_Scale(xml_elem));
+			objects.push_back(parseOperation_Scale(xml_elem, materials));
 		else
 			throw std::invalid_argument(boost::str(boost::format("Invalid object/operation type \"%s\"") % name));
 
@@ -210,23 +248,26 @@ pObject XML::parseObjectOrOperation(XMLElement* xml_elem) {
 
 }
 
-pObject XML::parseObject_Sphere(XMLElement* xml_elem) {
-	return pObject(new Sphere());
+pObject XML::parseObject_Sphere(XMLElement* xml_elem, list<pMaterial> materials) {
+	return pObject(new Sphere(
+		getMaterial(
+			getParameter(xml_elem, "material"),
+			materials)));
 }
 
 pObject XML::parseObject_PointLight(XMLElement* xml_elem) {
-	Color intensity(parseColor(xml_elem, "intensity"));
-	return pObject(new PointLight(intensity));
+	return pObject(new PointLight(
+		parseColor(xml_elem, "intensity")));
 }
 
-pObject XML::parseOperation_Translate(XMLElement *xml_elem) {
+pObject XML::parseOperation_Translate(XMLElement *xml_elem, list<pMaterial> materials) {
 	Vector3d delta(parseVector3d(xml_elem));
-	pObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	pObject obj = parseObjectOrOperation(xml_elem->FirstChildElement(), materials);
 	return obj->translate(delta);
 }
 
-pObject XML::parseOperation_Scale(XMLElement *xml_elem) {
+pObject XML::parseOperation_Scale(XMLElement *xml_elem, list<pMaterial> materials) {
 	double factor(parseDouble(xml_elem));
-	pObject obj = parseObjectOrOperation(xml_elem->FirstChildElement());
+	pObject obj = parseObjectOrOperation(xml_elem->FirstChildElement(), materials);
 	return obj->scale(factor);
 }

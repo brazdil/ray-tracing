@@ -10,6 +10,7 @@
 
 #include "NonRenderable.h"
 #include "Color.h"
+#include <list>
 
 class Light: public NonRenderable {
 private:
@@ -18,7 +19,7 @@ public:
 	Light();
 	virtual ~Light();
 
-	static vector<const Light*> filterLights(pObject object);
+	static list<const Light*> filterLights(pObject object);
 };
 
 #endif /* LIGHT_H_ */

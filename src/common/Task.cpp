@@ -62,7 +62,7 @@ Task::Task(pBinaryData input_file) {
 	XMLDocument xml_scene;
 	int error = xml_scene.Parse(file_xml_scene->data());
 	if (error != XML_SUCCESS)
-		throw runtime_error(str(format("Could not parse the scene description: %s") % xml_scene.GetErrorStr1()));
+		throw runtime_error(str(format("Error in scene's XML file: %s") % xml_scene.GetErrorStr1()));
 	// Check root element's name - raytracing
 	XMLElement* xml_root = xml_scene.RootElement();
 	if (!xml_root || !XMLUtil::StringEqual(xml_root->Name(), "raytracing"))
@@ -70,7 +70,8 @@ Task::Task(pBinaryData input_file) {
 
 	mCamera = XML::parseCamera(xml_root);
 	mScreen = XML::parseScreen(xml_root, mCamera);
-	mSceneObject = XML::parseObjects(xml_root);
+	mMaterials = XML::parseMaterials(xml_root);
+	mSceneObject = XML::parseObjects(xml_root, mMaterials);
 	mLights = Light::filterLights(mSceneObject);
 }
 
@@ -90,6 +91,6 @@ pObject Task::getSceneObject() {
 	return mSceneObject;
 }
 
-vector<const Light*> Task::getLights() {
+list<const Light*> Task::getLights() {
 	return mLights;
 }

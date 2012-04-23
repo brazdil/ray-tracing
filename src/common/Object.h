@@ -11,6 +11,7 @@
 #include "Ray.h"
 #include "BoundingBox.h"
 #include "Color.h"
+#include "Material.h"
 
 #include "utils.h"
 #include <vector>
@@ -37,7 +38,7 @@ private:
 	 * whether it should be included in the result. The only difference is Composite,
 	 * which aggregates results of its sub-objects.
 	 */
-	virtual void filter(list<const Object*> result, bool (*fn)(const Object*)) const;
+	virtual void filter(list<const Object*>& result, bool (*fn)(const Object*)) const;
 
 	/*
 	 * Return list of all intersections between the object and a ray.
@@ -55,16 +56,18 @@ private:
 	 * Returns first incident SurfaceObject and the point of intersection
 	 */
 	IntersectionPair first_intersection(const Ray& ray) const;
+	class no_intersection_exception : public std::exception { };
+
 public:
 	Object();
 	virtual ~Object();
 
-	class no_intersection_exception : public std::exception { };
-
 	/**
-	 * Returns color of object that is hit by a ray, or throws no_intersection_exception.
+	 * Returns color of object that is hit by a ray, or background_color otherwise.
+	 * Last argument is "time to live", number of recursive ray-traces, before
+	 * it gives up and returns background_color.
 	 */
-	Color getColorAtIntersection(const Ray& ray) const;
+	Color getColorAtIntersection(const Ray& ray, const Color& background_color, unsigned int ttl = 10) const;
 
 	/*
 	 * Translate

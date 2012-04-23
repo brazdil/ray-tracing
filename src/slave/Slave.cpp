@@ -128,13 +128,9 @@ Slave::~Slave() {
 void Slave::compute_pixel(socket_ptr sock, pTask task, pThreadSemaphore thread_semaphore, pResultSender result_sender, unsigned int col, unsigned int row, unsigned int image_width) {
 	mLogger->println(boost::format("Computing %dx%d") % col % row, Logger::DETAILED);
 
-	Color result = task->getScreen()->getBackgroundColor();
-	try {
-		result = task->getSceneObject()->getColorAtIntersection(
-			task->getScreen()->getRay(image_width, col, row));
-	} catch (NonRenderable::no_intersection_exception&) {
-		// no need to handle
-	}
+	Color result = task->getSceneObject()->getColorAtIntersection(
+	                   task->getScreen()->getRay(image_width, col, row),
+	                   task->getScreen()->getBackgroundColor());
 
 	result_sender->send_result(col, row, result);
 //	mLogger->incrementAndPrintProgressBar();

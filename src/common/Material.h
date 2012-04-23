@@ -10,6 +10,8 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
+#include <boost/shared_ptr.hpp>
+#include "Color.h"
 
 class Material {
 private:
@@ -19,9 +21,14 @@ public:
 	Material(std::string name);
 	virtual ~Material();
 
-	virtual double portion_reflection() const = 0;
-	virtual double portion_refraction() const = 0;
-	double portion_material() const;
+	std::string getName();
+
+	virtual Color getDiffuse() const = 0;
+	virtual Color getSpecular() const = 0;
+	virtual Color getTransmit() const = 0;
+	virtual double getRefractiveIndex() const = 0;
 };
+
+typedef boost::shared_ptr<Material> pMaterial;
 
 #endif /* MATERIAL_H_ */

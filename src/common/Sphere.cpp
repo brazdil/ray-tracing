@@ -10,13 +10,13 @@
 
 using namespace tinyxml2;
 
-Sphere::Sphere()
-	: mCenter(0.0, 0.0, 0.0), mRadius(1.0), mNormalOutside(true) {
+Sphere::Sphere(pMaterial material)
+	: mCenter(0.0, 0.0, 0.0), mRadius(1.0), mNormalOutside(true), mMaterial(material) {
 	init();
 }
 
-Sphere::Sphere(Vector3d center, double radius, bool normal_outside)
-	: mCenter(center), mRadius(radius), mNormalOutside(normal_outside) {
+Sphere::Sphere(pMaterial material, Vector3d center, double radius, bool normal_outside)
+	: mCenter(center), mRadius(radius), mNormalOutside(normal_outside), mMaterial(material) {
 	init();
 }
 
@@ -65,15 +65,19 @@ Vector3d Sphere::normal(const Vector3d& point_on_surface) const {
 	return unit_normal;
 }
 
+pMaterial Sphere::material() const {
+	return mMaterial;
+}
+
 pObject Sphere::translate(const Vector3d& delta) const {
-	return pObject(new Sphere(mCenter + delta, mRadius, mNormalOutside));
+	return pObject(new Sphere(mMaterial, mCenter + delta, mRadius, mNormalOutside));
 }
 
 pObject Sphere::scale(double factor) const {
-	return pObject(new Sphere(mCenter * factor, mRadius * factor, mNormalOutside));
+	return pObject(new Sphere(mMaterial, mCenter * factor, mRadius * factor, mNormalOutside));
 }
 
-// rotate center (and top point)
+// rotate center (and top/side points)
 
 std::string Sphere::print_debug(unsigned int indent) const {
 	std::ostringstream output;
@@ -83,6 +87,7 @@ std::string Sphere::print_debug(unsigned int indent) const {
 	output << "Sphere: center=" << toString(mCenter)
 		   << " radius=" << mRadius
 		   << " normal_out=" << mNormalOutside
+		   << " material=" << mMaterial->getName()
 		   << std::endl;
 
 	return output.str();

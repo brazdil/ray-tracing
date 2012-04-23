@@ -17,6 +17,11 @@ private:
 	 */
 	virtual Vector3d normal(const Vector3d& point_on_surface) const = 0;
 
+	/*
+	 * Returns the material of the object
+	 */
+	virtual pMaterial material() const = 0;
+
 public:
 	SurfaceObject();
 	virtual ~SurfaceObject();

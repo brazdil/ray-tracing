@@ -30,12 +30,23 @@ IntersectionPair Object::first_intersection(const Ray& ray) const {
 	return minimum;
 }
 
-Color Object::getColorAtIntersection(const Ray& ray) const {
-	IntersectionPair intersection = first_intersection(ray); // might throw no_intersection exception, let propagate
-	return Color((unsigned char) 012, (unsigned char) 123, (unsigned char) 234);
+Color Object::getColorAtIntersection(const Ray& ray, const Color& background_color, unsigned int ttl) const {
+	if (ttl == 0)
+		return background_color;
+
+	try {
+		Color result;
+		IntersectionPair intersection = first_intersection(ray);
+
+
+
+		return result;
+	} catch (no_intersection_exception&) {
+		return background_color;
+	}
 }
 
-void Object::filter(list<const Object*> result, bool (*fn)(const Object*)) const {
+void Object::filter(list<const Object*>& result, bool (*fn)(const Object*)) const {
 	if (fn(this))
 		result.push_back(this);
 }

@@ -30,7 +30,7 @@ const BoundingBox& Composite::bounding_box() const {
 	return mBoundingBox;
 }
 
-void Composite::filter(list<const Object*> result, bool (*fn)(const Object*)) const {
+void Composite::filter(list<const Object*>& result, bool (*fn)(const Object*)) const {
 	BOOST_FOREACH(pObject obj, mObjects)
 		obj->filter(result, fn);
 }

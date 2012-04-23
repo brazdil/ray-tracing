@@ -6,6 +6,7 @@
  */
 
 #include "Light.h"
+#include <iostream>
 
 Light::Light() {
 }
@@ -18,13 +19,12 @@ bool Light::filter_light(const Object* obj) {
 	return (l != NULL);
 }
 
-vector<const Light*> Light::filterLights(pObject object) {
-	vector<const Light*> result;
-
+list<const Light*> Light::filterLights(pObject object) {
+	list<const Light*> result;
 	list<const Object*> temp;
+
 	object->filter(temp, filter_light);
 
-	result.reserve(temp.size());
 	BOOST_FOREACH(const Object* obj, temp)
 		result.push_back(dynamic_cast<const Light*>(obj));
 

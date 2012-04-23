@@ -17,15 +17,17 @@ private:
 	double mRadius;
 	bool mNormalOutside;
 	BoundingBox mBoundingBox;
+	pMaterial mMaterial;
 
 	virtual void ray_intersections(const Ray &ray, list<IntersectionPair> &result) const;
 	virtual const BoundingBox& bounding_box() const;
 	virtual Vector3d normal(const Vector3d& point_on_surface) const;
+	virtual pMaterial material() const;
 
 	void init();
 public:
-	Sphere();
-	Sphere(Vector3d center, double radius, bool normal_outside);
+	Sphere(pMaterial material);
+	Sphere(pMaterial material, Vector3d center, double radius, bool normal_outside);
 	virtual ~Sphere();
 
 	virtual pObject translate(const Vector3d& delta) const;

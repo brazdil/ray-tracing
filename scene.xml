@@ -1,20 +1,26 @@
 <raytracing>
 	<camera>
-		<position 		vector3="-1.0 2.0 -5.0" />
-		<look-at 		vector3="-4.0 1.0 5.0" />
-		<field-of-view 	angle="60 deg" />
+		<position vector3="-1.0 2.0 -5.0" />
+		<look-at vector3="-4.0 1.0 5.0" />
+		<field-of-view angle="60 deg" />
 	</camera>
 	<screen>
 		<distance		double="8.571628677317875" />
 		<aspect-ratio	ratio="16 9" />
-		<background		color="FFFFFF" />
+		<background		color="E2E3DC" />
 	</screen>
 	<materials>
+		<solid id="solid-pastel-blue">
+			<diffuse color="5670B7" />
+			<specular color="CCCCCC" />
+			<transmit color="333333" />
+			<refractive-index double="1.5" />
+		</solid>
 	</materials>
 	<objects>
 		<translate vector3="-0.5 0.6 4.0">
 			<scale double="0.6">
-				<sphere material="glossy_black" />
+				<sphere material="solid-pastel-blue" />
 			</scale>
 			<translate vector3="2.0 0.0 0.0">
 				<point-light>
@@ -22,7 +28,7 @@
 				</point-light>
 			</translate>
 			<translate vector3="0.0 1.0 0.0">
-				<sphere material="glossy_black" />
+				<sphere material="solid-pastel-blue" />
 			</translate>
 		</translate>
 	</objects>

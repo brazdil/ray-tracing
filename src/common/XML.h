@@ -8,6 +8,7 @@
 #ifndef XML_H_
 #define XML_H_
 
+#include <boost/foreach.hpp>
 #include "tinyxml2.h"
 #include <Eigen/Dense>
 
@@ -16,6 +17,8 @@
 
 #include "Camera.h"
 #include "Screen.h"
+
+#include "SolidMaterial.h"
 
 #include "Sphere.h"
 #include "Composite.h"
@@ -30,6 +33,7 @@ private:
 	static std::string getProperty(XMLElement* elem, std::string property, std::string type);
 	static std::string getParameter(XMLElement *elem, std::string type);
 	static unsigned char getHex(char hex);
+	static pMaterial getMaterial(std::string name, list<pMaterial> materials);
 
 public:
 
@@ -55,13 +59,16 @@ public:
 
 	static pCamera parseCamera(XMLElement* xml_root);
 	static pScreen parseScreen(XMLElement* xml_root, pCamera camera);
-	static pObject parseObjects(XMLElement* xml_root);
+	static list<pMaterial> parseMaterials(XMLElement* xml_root);
+	static pObject parseObjects(XMLElement* xml_root, list<pMaterial> materials);
 
-	static pObject parseObjectOrOperation(XMLElement* xml);
-	static pObject parseObject_Sphere(XMLElement* xml);
+	static pMaterial parseSolidMaterial(XMLElement* xml);
+
+	static pObject parseObjectOrOperation(XMLElement* xml, list<pMaterial> materials);
+	static pObject parseObject_Sphere(XMLElement* xml, list<pMaterial> materials);
 	static pObject parseObject_PointLight(XMLElement* xml);
-	static pObject parseOperation_Translate(XMLElement* xml);
-	static pObject parseOperation_Scale(XMLElement* xml);
+	static pObject parseOperation_Translate(XMLElement* xml, list<pMaterial> materials);
+	static pObject parseOperation_Scale(XMLElement* xml, list<pMaterial> materials);
 };
 
 #endif /* XML_H_ */

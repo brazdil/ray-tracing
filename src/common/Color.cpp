@@ -25,10 +25,14 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b)
 }
 
 void Color::init() {
-	if (mR < 0.0 || mR > 1.0 ||
-		mG < 0.0 || mG > 1.0 ||
-		mB < 0.0 || mB > 1.0)
-		throw std::invalid_argument("Color channel out of bounds");
+	if (mR < 0.0) mR = 0.0;
+	else if (mR > 1.0) mR = 1.0;
+
+	if (mG < 0.0) mG = 0.0;
+	else if (mG > 1.0) mG = 1.0;
+
+	if (mB < 0.0) mB = 0.0;
+	else if (mB > 1.0) mB = 1.0;
 }
 
 Color::~Color() {

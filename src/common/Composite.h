@@ -19,7 +19,7 @@ private:
 	vector<pObject> mObjects;
 	BoundingBox mBoundingBox;
 
-	virtual void filter(list<const Object*> result, bool (*fn)(const Object*)) const;
+	virtual void filter(list<const Object*>& result, bool (*fn)(const Object*)) const;
 
 	virtual void ray_intersections(const Ray &ray, list<IntersectionPair> &result) const;
 	virtual const BoundingBox& bounding_box() const;

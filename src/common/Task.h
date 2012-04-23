@@ -12,8 +12,10 @@
 #include "Screen.h"
 #include "Object.h"
 #include "Light.h"
+#include "Material.h"
 
 #include <vector>
+#include <list>
 #include <boost/shared_ptr.hpp>
 
 using namespace std;
@@ -29,7 +31,8 @@ class Task {
 	pCamera mCamera;
 	pScreen mScreen;
 	pObject mSceneObject;
-	vector<const Light*> mLights;
+	list<pMaterial> mMaterials;
+	list<const Light*> mLights;
 
 public:
 	Task(pBinaryData input_file);
@@ -38,7 +41,7 @@ public:
 	pCamera getCamera();
 	pScreen getScreen();
 	pObject getSceneObject();
-	vector<const Light*> getLights();
+	list<const Light*> getLights();
 };
 
 typedef shared_ptr<Task> pTask;
