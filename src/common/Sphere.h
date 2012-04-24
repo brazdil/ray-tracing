@@ -21,8 +21,6 @@ private:
 
 	virtual void ray_intersections(const Ray &ray, list<IntersectionPair> &result) const;
 	virtual const BoundingBox& bounding_box() const;
-	virtual Vector3d normal(const Vector3d& point_on_surface) const;
-	virtual pMaterial material() const;
 
 	void init();
 public:
@@ -33,6 +31,9 @@ public:
 	virtual pObject translate(const Vector3d& delta) const;
 	virtual pObject scale(double factor) const;
 	virtual std::string print_debug(unsigned int indent) const;
+
+	virtual Vector3d getNormal(const Vector3d& point_on_surface) const;
+	virtual pMaterial getMaterial() const;
 };
 
 #endif /* SPHERE_H_ */

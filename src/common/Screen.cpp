@@ -73,7 +73,6 @@ Ray Screen::getRay(unsigned int image_width, unsigned int x, unsigned int y) con
 Ray Screen::getRay(double x, double y) const {
 	Vector3d point_on_screen = (mTopLeftCorner + (x * mHorizontal) + (y * mVertical));
 	Vector3d direction = point_on_screen - mCamera->getPosition();
-	direction.normalize();
 	return Ray(mCamera->getPosition(), direction);
 }
 

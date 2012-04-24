@@ -19,6 +19,8 @@ public:
 	Light();
 	virtual ~Light();
 
+	virtual void addDiffuseIntensity(Color& result, const Vector3d& hit_point, const Vector3d& normal, pMaterial material, pObject root_object) const = 0;
+
 	static list<const Light*> filterLights(pObject object);
 };
 

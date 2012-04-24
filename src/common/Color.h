@@ -26,6 +26,10 @@ public:
 	unsigned char getUnsignedCharRed() const;
 	unsigned char getUnsignedCharGreen() const;
 	unsigned char getUnsignedCharBlue() const;
+
+	Color& operator+=(const Color &rhs);
+	Color operator*(const Color &rhs) const;
+	Color operator*(const double &rhs) const;
 };
 
 #endif /* COLOR_H_ */

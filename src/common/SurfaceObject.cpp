@@ -13,3 +13,7 @@ SurfaceObject::SurfaceObject() {
 SurfaceObject::~SurfaceObject() {
 }
 
+void SurfaceObject::insert_intersection(IntersectionPair intersection, list<IntersectionPair> &result_list) const {
+	if (!isZero(intersection.second) && intersection.second > 0.0)
+		result_list.push_back(intersection);
+}

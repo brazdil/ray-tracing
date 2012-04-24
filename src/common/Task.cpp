@@ -79,6 +79,31 @@ Task::~Task() {
 
 }
 
+Color Task::getColorAtIntersection(const Ray& ray, unsigned int ttl) const {
+	return color_at_intersection(mSceneObject, ray, ttl);
+}
+
+Color Task::color_at_intersection(pObject obj, const Ray& ray, unsigned int ttl) const {
+	if (ttl == 0)
+		return mScreen->getBackgroundColor();
+
+	try {
+		Color result;
+		IntersectionPair intersection = obj->getFirstIntersection(ray);
+
+		const SurfaceObject* hit_obj = intersection.first;
+		Vector3d hit_point = ray.getPointOnRay(intersection.second);
+
+		BOOST_FOREACH(const Light* light, mLights) {
+			light->addDiffuseIntensity(result, hit_point, hit_obj->getNormal(hit_point), hit_obj->getMaterial(), mSceneObject);
+		}
+
+		return result;
+	} catch (Object::no_intersection_exception&) {
+		return mScreen->getBackgroundColor();
+	}
+}
+
 pCamera Task::getCamera() {
 	return mCamera;
 }
@@ -93,4 +118,8 @@ pObject Task::getSceneObject() {
 
 list<const Light*> Task::getLights() {
 	return mLights;
+}
+
+list<pMaterial> Task::getMaterials() {
+	return mMaterials;
 }

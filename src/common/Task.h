@@ -34,14 +34,23 @@ class Task {
 	list<pMaterial> mMaterials;
 	list<const Light*> mLights;
 
+	Color color_at_intersection(pObject obj, const Ray& ray, unsigned int ttl) const;
 public:
 	Task(pBinaryData input_file);
 	virtual ~Task();
+
+	/**
+	 * Returns color of object that is hit by a ray, or background_color otherwise.
+	 * Last argument is "time to live", number of recursive ray-traces, before
+	 * it gives up and returns background_color.
+	 */
+	Color getColorAtIntersection(const Ray& ray, unsigned int ttl = 10) const;
 
 	pCamera getCamera();
 	pScreen getScreen();
 	pObject getSceneObject();
 	list<const Light*> getLights();
+	list<pMaterial> getMaterials();
 };
 
 typedef shared_ptr<Task> pTask;

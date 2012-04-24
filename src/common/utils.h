@@ -19,7 +19,7 @@
 
 using namespace Eigen;
 
-const double ZERO_THRESHOLD = (8.0 * std::numeric_limits<double>::epsilon());
+const double ZERO_THRESHOLD = (128.0 * std::numeric_limits<double>::epsilon());
 
 inline bool isZero(double x) {
 	if ((x < ZERO_THRESHOLD) && (x > -ZERO_THRESHOLD))
@@ -41,6 +41,14 @@ inline bool isEqual(const Vector3d& v1, const Vector3d& v2) {
 	double v2_z = v2.data()[2];
 
 	return isEqual(v1_x, v2_x) && isEqual(v1_y, v2_y) && isEqual(v1_z, v2_z);
+}
+
+inline bool isStrictlyLessThan(double x, double y) {
+	return x < y && !isEqual(x, y);
+}
+
+inline bool isLessThanOrEqual(double x, double y) {
+	return x < y || isEqual(x, y);
 }
 
 inline std::string toString(const Vector3d& v) {

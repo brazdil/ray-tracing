@@ -6,6 +6,7 @@
  */
 
 #include "Object.h"
+#include <limits>
 
 Object::Object() {
 }
@@ -13,7 +14,7 @@ Object::Object() {
 Object::~Object() {
 }
 
-IntersectionPair Object::first_intersection(const Ray& ray) const {
+IntersectionPair Object::getFirstIntersection(const Ray& ray) const {
 	if (!bounding_box().intersects(ray))
 		throw no_intersection_exception();
 
@@ -30,19 +31,17 @@ IntersectionPair Object::first_intersection(const Ray& ray) const {
 	return minimum;
 }
 
-Color Object::getColorAtIntersection(const Ray& ray, const Color& background_color, unsigned int ttl) const {
-	if (ttl == 0)
-		return background_color;
+bool Object::isIntersected(const Vector3d& v1, const Vector3d& v2) const {
+	// use ray from v1 to v2
+
+	Vector3d line = v2 - v1;
+	Ray ray(v1, line);
+	double line_length = line.dot(ray.getDirection()); // direction is normalized
 
 	try {
-		Color result;
-		IntersectionPair intersection = first_intersection(ray);
-
-
-
-		return result;
+		return isStrictlyLessThan(getFirstIntersection(ray).second, line_length);
 	} catch (no_intersection_exception&) {
-		return background_color;
+		return false;
 	}
 }
 

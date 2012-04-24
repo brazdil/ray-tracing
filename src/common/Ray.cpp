@@ -11,6 +11,8 @@
 Ray::Ray(const Vector3d& origin, const Vector3d& direction)
 	: mOrigin(origin), mDirection(direction) {
 
+	mDirection.normalize();
+
 	_x = mOrigin.data()[0];
 	_y = mOrigin.data()[1];
 	_z = mOrigin.data()[2];

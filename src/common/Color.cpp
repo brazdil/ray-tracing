@@ -38,6 +38,28 @@ void Color::init() {
 Color::~Color() {
 }
 
+Color& Color::operator+=(const Color &rhs) {
+	this->mR += rhs.mR;
+	this->mG += rhs.mG;
+	this->mB += rhs.mB;
+	init();
+	return *this;
+}
+
+Color Color::operator*(const Color &rhs) const {
+	return Color(
+		this->mR * rhs.mR,
+		this->mG * rhs.mG,
+		this->mB * rhs.mB);
+}
+
+Color Color::operator*(const double &rhs) const {
+	return Color(
+		(float) (this->mR * rhs),
+		(float) (this->mG * rhs),
+		(float) (this->mB * rhs));
+}
+
 unsigned char Color::getUnsignedCharRed() const {
 	return (unsigned char) (mR * 255.0);
 }

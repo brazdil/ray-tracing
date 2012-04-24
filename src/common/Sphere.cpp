@@ -40,18 +40,19 @@ void Sphere::init() {
 
 void Sphere::ray_intersections(const Ray &ray, list<IntersectionPair> &result) const {
 	Vector3d vec_center_to_ray_point = ray.getOrigin() - mCenter;
-	double a = ray.getDirection().dot(ray.getDirection());
-	double b = vec_center_to_ray_point.dot(2.0 * ray.getDirection());
-	double c = vec_center_to_ray_point.dot(vec_center_to_ray_point) - mRadius * mRadius;
-	double d = b*b - 4*a*c;
+	const double a = ray.getDirection().dot(ray.getDirection());
+	const double b = vec_center_to_ray_point.dot(2.0 * ray.getDirection());
+	const double c = vec_center_to_ray_point.dot(vec_center_to_ray_point) - mRadius * mRadius;
+	const double d = b*b - 4*a*c;
 
+	double r;
 	if (isZero(d)) {
 		// one intersection
-		result.push_back(IntersectionPair(this, (-b) / (2*a)));
+		insert_intersection(IntersectionPair(this, (-b) / (2*a)), result);
 	} else if (d > 0.0) {
 		// two intersections
-		result.push_back(IntersectionPair(this, (-b + sqrt(d)) / (2*a)));
-		result.push_back(IntersectionPair(this, (-b - sqrt(d)) / (2*a)));
+		insert_intersection(IntersectionPair(this, (-b + sqrt(d)) / (2*a)), result);
+		insert_intersection(IntersectionPair(this, (-b - sqrt(d)) / (2*a)), result);
 	}
 }
 
@@ -59,13 +60,13 @@ const BoundingBox& Sphere::bounding_box() const {
 	return mBoundingBox;
 }
 
-Vector3d Sphere::normal(const Vector3d& point_on_surface) const {
+Vector3d Sphere::getNormal(const Vector3d& point_on_surface) const {
 	Vector3d unit_normal = mNormalOutside ? point_on_surface - mCenter : mCenter - point_on_surface;
 	unit_normal.normalize();
 	return unit_normal;
 }
 
-pMaterial Sphere::material() const {
+pMaterial Sphere::getMaterial() const {
 	return mMaterial;
 }
 

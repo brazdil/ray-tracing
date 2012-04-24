@@ -52,22 +52,20 @@ private:
 	 */
 	virtual const BoundingBox& bounding_box() const = 0;
 
-	/*
-	 * Returns first incident SurfaceObject and the point of intersection
-	 */
-	IntersectionPair first_intersection(const Ray& ray) const;
-	class no_intersection_exception : public std::exception { };
-
 public:
 	Object();
 	virtual ~Object();
 
-	/**
-	 * Returns color of object that is hit by a ray, or background_color otherwise.
-	 * Last argument is "time to live", number of recursive ray-traces, before
-	 * it gives up and returns background_color.
+	/*
+	 * Returns first incident SurfaceObject and the point of intersection
 	 */
-	Color getColorAtIntersection(const Ray& ray, const Color& background_color, unsigned int ttl = 10) const;
+	IntersectionPair getFirstIntersection(const Ray& ray) const;
+	class no_intersection_exception : public std::exception { };
+
+	/*
+	 * Returns whether line given by two points intersects the object
+	 */
+	bool isIntersected(const Vector3d& v1, const Vector3d& v2) const;
 
 	/*
 	 * Translate

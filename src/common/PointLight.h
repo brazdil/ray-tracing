@@ -20,6 +20,8 @@ public:
 	PointLight(const Vector3d& position, const Color& intensity);
 	virtual ~PointLight();
 
+	virtual void addDiffuseIntensity(Color& result, const Vector3d& hit_point, const Vector3d& normal, pMaterial material, pObject root_object) const;
+
 	virtual pObject translate(const Vector3d& delta) const;
 	virtual pObject scale(double factor) const;
 	virtual std::string print_debug(unsigned int indent) const;
