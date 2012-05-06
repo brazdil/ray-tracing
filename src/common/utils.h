@@ -19,7 +19,7 @@
 
 using namespace Eigen;
 
-const double ZERO_THRESHOLD = (128.0 * std::numeric_limits<double>::epsilon());
+const double ZERO_THRESHOLD = (4096.0 * std::numeric_limits<double>::epsilon());
 
 inline bool isZero(double x) {
 	if ((x < ZERO_THRESHOLD) && (x > -ZERO_THRESHOLD))

@@ -24,7 +24,9 @@ using namespace boost;
 typedef shared_ptr< vector<char> >	pBinaryData;
 
 inline pBinaryData create_binary_data(long len) {
-	return pBinaryData(new vector<char>(len));
+	pBinaryData ptr(new vector<char>());
+	ptr->reserve(len);
+	return ptr;
 }
 
 class Task {

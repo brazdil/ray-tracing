@@ -59,10 +59,10 @@ Slave::ResultSender::ResultSender(pLogger logger, socket_ptr sock, unsigned int 
 	  mSocket(sock),
 	  mImageHeight(image_height),
 	  mExpectedCol(first_col),
-	  mExpectedRow(first_row),
-	  mWaitingResults(max_threads) {
+	  mExpectedRow(first_row) {
 	if (mExpectedRow > mImageHeight)
 		throw std::invalid_argument("First row higher than image height");
+	mWaitingResults.reserve(max_threads);
 }
 
 void Slave::ResultSender::send_result(unsigned int col, unsigned int row, Color color) {
