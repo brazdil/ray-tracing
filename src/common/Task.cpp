@@ -28,7 +28,6 @@ pBinaryData extract_file(pBinaryData input_file, string filename) {
 	file = archive_read_new();
 	archive_read_support_compression_none(file);
 	archive_read_support_format_tar(file);
-	std::cout << input_file->size() << std::endl;
 	res = archive_read_open_memory(file, input_file->data(), input_file->size());
 	if (res != ARCHIVE_OK)
 		throw runtime_error("The input file is not a TAR");
