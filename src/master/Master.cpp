@@ -43,12 +43,13 @@ Master::Master(pLogger logger,
 
 		size_t file_length = file.tellg();
 		if (file_length > (uint32_t) 0xFFFFFFFFFFFFFFFF)
-			throw std::invalid_argument("Input file too large (max 4GB");
+			throw std::invalid_argument("Input file too large (max 4GB)");
 
 		file.seekg(0, std::ios_base::beg);
 		file.clear();
 
 		mInputFile = create_binary_data(file_length);
+		mInputFile->resize(file_length, 0);
 		file.read(mInputFile->data(), mInputFile->size());
 	} catch (std::exception& e) {
 		throw std::runtime_error("Could not load the input file");

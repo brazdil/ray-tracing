@@ -180,16 +180,17 @@ pBinaryData Slave::protocol_download_input_file(socket_ptr sock, uint32_t input_
 
 	pBinaryData input_file = create_binary_data(input_file_length);
 	boost::array<char, 1024> buffer_input;
-	size_t input_file_fill = 0;
+	uint32_t input_file_fill = 0;
 
 	while (input_file_fill < input_file_length) {
 		size_t length = sock->read_some(boost::asio::buffer(buffer_input), error);
-		if (error == boost::asio::error::eof || length > input_file_length - input_file_fill || length > buffer_input.size())
+		if (error == boost::asio::error::eof || length < input_file_length - input_file_fill || length > buffer_input.size())
 			throw std::runtime_error(boost::str(boost::format("Unexpected EOF or wrong length")));
 		else if (error)
 			throw boost::system::system_error(error);
 
-		memcpy(input_file->data() + input_file_fill, buffer_input.c_array(), length);
+		std::cout << "inserting " << length << std::endl;
+		input_file->insert(input_file->end(), buffer_input.begin(), buffer_input.end());
 
 		input_file_fill += length;
 		mLogger->incrementAndPrintProgressBar(length);
