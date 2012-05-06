@@ -1,11 +1,5 @@
 env = Environment()
 
-arg_sdl = ARGUMENTS.get('sdl', '1')
-if arg_sdl == '0':
-	use_sdl = False
-else:
-	use_sdl = True
-
 # Predefined functions 
 
 def CheckPKGConfig(context, version):
@@ -22,6 +16,22 @@ def CheckPKG(context, name):
 
 # Configuration:
 
+arg_sdl = ARGUMENTS.get('sdl', '1')
+if arg_sdl == '0':
+	use_sdl = False
+else:
+	use_sdl = True
+
+arg_includedir = ARGUMENTS.get('include-dir', '')
+env.Append(CPPPATH=arg_includedir)
+
+arg_libdir = ARGUMENTS.get('lib-dir', '')
+env.Append(LIBPATH='.:')
+env.Append(LIBPATH=arg_libdir)
+
+print 'include path: ' + arg_includedir
+print 'lib path: ' + arg_libdir
+
 conf = Configure(env, custom_tests = { 'CheckPKGConfig' : CheckPKGConfig,
                                        'CheckPKG' : CheckPKG })
 
@@ -29,9 +39,14 @@ if not conf.CheckPKGConfig('0.15.0'):
 	print 'pkg-config >= 0.15.0 not found.'
 	Exit(1)
 
-if not conf.CheckPKG('eigen3 >= 3.0.5'):
-	print 'eigen3 >= 3.0.5 not found.'
-	Exit(1)
+if conf.CheckPKG('eigen3 >= 3.0.5'):
+	env.ParseConfig('pkg-config --cflags eigen3')
+else:
+	if arg_includedir == '':
+		print 'eigen3 >= 3.0.5 not found.'
+		Exit(1)
+	else:
+		print 'will look for eigen3 in ' + arg_includedir
 
 if use_sdl:
 	if not conf.CheckPKG('sdl >= 1.2.14'):
@@ -47,8 +62,6 @@ if not use_sdl:
 # boost_dir = ARGUMENTS.get('boost-dir', '')
 # if boost_dir:
 # 	compile_append += '-I' + boost_dir
-
-env.ParseConfig('pkg-config --cflags eigen3')
 
 source_common = Glob('src/common/*.cpp')
 source_master = Glob('src/master/*.cpp') + Glob('src/master/*.c')
@@ -80,6 +93,6 @@ env.StaticLibrary(name_lib_common, source_common, CCFLAGS = includes_common)
 if use_sdl:
 	env.StaticLibrary(name_lib_sdl_gfx, source_sdl_gfx, CCFLAGS = includes_sdl_gfx)
 
-program_slave = env.Program('slave', source_slave, LIBS = libs_slave, CCFLAGS = includes_slave, LIBPATH = '.')
-program_master = env.Program('master', source_master, LIBS = libs_master, CCFLAGS = includes_master, LIBPATH = '.')
+program_slave = env.Program('slave', source_slave, LIBS = libs_slave, CCFLAGS = includes_slave)
+program_master = env.Program('master', source_master, LIBS = libs_master, CCFLAGS = includes_master)
 

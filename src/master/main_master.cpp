@@ -13,7 +13,7 @@ namespace po = boost::program_options;
 
 using namespace std;
 
-int main(int argc, const char** argv) {
+int main(int argc, char** argv) {
 	int arg_log;
 	unsigned short arg_port;
 	unsigned int arg_width;
