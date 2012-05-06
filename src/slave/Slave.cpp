@@ -70,7 +70,7 @@ void Slave::ResultSender::send_result(unsigned int col, unsigned int row, Color 
 	boost::mutex::scoped_lock lock(mObjectLock);
 
 	// put result in the queue
-	mLogger->println(boost::format("Queuing %dx%d, expecting %dx%d") % col % row % mExpectedCol % mExpectedRow, Logger::DETAILED);
+	// mLogger->println(boost::format("Queuing %dx%d, expecting %dx%d") % col % row % mExpectedCol % mExpectedRow, Logger::DETAILED);
 	mWaitingResults.push_back(Result(col, row, color));
 
 	// try to send as many results as possible
@@ -81,7 +81,7 @@ void Slave::ResultSender::send_result(unsigned int col, unsigned int row, Color 
 		// go through all the waiting results
 		for (std::vector<Result>::iterator it = mWaitingResults.begin(); it < mWaitingResults.end(); it++) {
 			if (((*it).col == mExpectedCol) && ((*it).row == mExpectedRow)) {
-				mLogger->println(boost::format("Sending %dx%d") % (*it).col % (*it).row, Logger::DETAILED);
+				// mLogger->println(boost::format("Sending %dx%d") % (*it).col % (*it).row, Logger::DETAILED);
 
 				// send it to the master
 				boost::array<char, 4> buffer_result;
@@ -113,10 +113,10 @@ void Slave::ResultSender::send_result(unsigned int col, unsigned int row, Color 
 Slave::Slave(pLogger logger, string host, unsigned short port, unsigned int max_threads)
 	: mLogger(logger), mMaster_Name(host), mMaster_Port(port), mMaxThreads(max_threads) {
 
-	mLogger->println("SLAVE", Logger::DETAILED);
-	mLogger->println(boost::format("\tHostname:       %s") % mMaster_Name, Logger::DETAILED);
-	mLogger->println(boost::format("\tPort:           %d") % mMaster_Port, Logger::DETAILED);
-	mLogger->println(boost::format("\tMax threads:    %d") % mMaxThreads, Logger::DETAILED);
+	mLogger->println("SLAVE", Logger::INFORMATIVE);
+	mLogger->println(boost::format("\tHostname:       %s") % mMaster_Name, Logger::INFORMATIVE);
+	mLogger->println(boost::format("\tPort:           %d") % mMaster_Port, Logger::INFORMATIVE);
+	mLogger->println(boost::format("\tMax threads:    %d") % mMaxThreads, Logger::INFORMATIVE);
 
 	if (mMaxThreads == 0)
 		throw std::invalid_argument("Need at least one thread");
